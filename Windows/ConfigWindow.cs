@@ -19,7 +19,7 @@ public class ConfigWindow : Window, IDisposable
                 ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoScrollWithMouse;
 
-        Size = new Vector2(360, 185);
+        Size = new Vector2(420, 260);
         SizeCondition = ImGuiCond.Always;
 
         configuration = plugin.Configuration;
