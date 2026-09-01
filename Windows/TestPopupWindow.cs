@@ -5,7 +5,7 @@ using Dalamud.Interface.Windowing;
 
 namespace QuestTextRecolor.Windows;
 
-class TestPopupWindow : Window, IDisposable
+class TestPopupWindow : Window
 {
     private readonly Configuration configuration;
 
@@ -169,9 +169,5 @@ class TestPopupWindow : Window, IDisposable
                 popupHeight - 40f
             )
         );
-    }
-
-    public void Dispose()
-    {
     }
 }

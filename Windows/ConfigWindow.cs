@@ -5,7 +5,7 @@ using Dalamud.Interface.Windowing;
 
 namespace QuestTextRecolor.Windows;
 
-public class ConfigWindow : Window, IDisposable
+public class ConfigWindow : Window
 {
     private readonly Configuration configuration;
     private readonly Plugin plugin;
@@ -23,10 +23,6 @@ public class ConfigWindow : Window, IDisposable
         SizeCondition = ImGuiCond.Always;
 
         configuration = plugin.Configuration;
-    }
-
-    public void Dispose()
-    {
     }
 
     public override void Draw()

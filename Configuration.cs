@@ -1,5 +1,4 @@
 using Dalamud.Configuration;
-using FFXIVClientStructs;
 using System;
 using System.Numerics;
 

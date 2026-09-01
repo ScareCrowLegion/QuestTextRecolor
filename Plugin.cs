@@ -7,8 +7,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using QuestTextRecolor.Windows;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using System.Threading.Tasks;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace QuestTextRecolor;
 
@@ -19,9 +17,6 @@ public sealed class Plugin : IDalamudPlugin
 
     [PluginService]
     internal static ICommandManager CommandManager { get; private set; } = null!;
-
-    [PluginService]
-    internal static IGameGui GameGui { get; private set; } = null!;
 
     [PluginService]
     internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
@@ -60,9 +55,9 @@ public sealed class Plugin : IDalamudPlugin
         );
 
         
-        PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
-        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
-        PluginInterface.UiBuilder.OpenMainUi += ToggleConfigUi;
+        PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
+        PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
+        PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;
 
 
         AddonLifecycle.RegisterListener(
@@ -81,12 +76,6 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleConfigUi;
 
         WindowSystem.RemoveAllWindows();
-
-        TestPopupWindow.Dispose();
-
-        ConfigWindow.Dispose();
-
-        TestPopupWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
     }
@@ -120,8 +109,6 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
-        int foundCount = 0;
-
         var textColor = Configuration.QuestTextColor;
         var edgeColor = Configuration.QuestEdgeColor;
 
@@ -149,8 +136,6 @@ public sealed class Plugin : IDalamudPlugin
                 continue;
 
             var textNode = (AtkTextNode*)node;
-
-            foundCount++;
 
             textNode->FontSize = (byte)Configuration.QuestFontSize;
 
