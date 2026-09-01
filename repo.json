@@ -7,7 +7,7 @@
     "Description": "Customize the color and outline of FFXIV quest objective text shown in the center-screen quest progression popup.",
     "ApplicableVersion": "any",
     "RepoUrl": "https://github.com/ScareCrowLegion/QuestTextRecolor",
-    "IconUrl": "https://github.com/ScareCrowLegion/QuestTextRecolor/blob/main/icon.png?raw=true",
+"IconUrl": "https://raw.githubusercontent.com/ScareCrowLegion/QuestTextRecolor/main/icon.png",
     "Tags": [
       "ui",
       "quest",
