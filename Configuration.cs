@@ -1,4 +1,5 @@
 using Dalamud.Configuration;
+using FFXIVClientStructs;
 using System;
 using System.Numerics;
 
@@ -10,6 +11,8 @@ public class Configuration : IPluginConfiguration
     public int Version { get; set; } = 0;
 
     public bool EnableQuestTextRecolor { get; set; } = true;
+
+    public int QuestFontSize { get; set; } = 18;
 
     public Vector4 QuestTextColor { get; set; } = new Vector4(
         242f / 255f,
@@ -30,7 +33,7 @@ public class Configuration : IPluginConfiguration
         Plugin.PluginInterface.SavePluginConfig(this);
     }
 
-    public void ResetColors()
+    public void ResetAppearance()
     {
         QuestTextColor = new Vector4(
             242f / 255f,
@@ -45,6 +48,8 @@ public class Configuration : IPluginConfiguration
             38f / 255f,
             1.0f
         );
+
+        QuestFontSize = 18;
 
         Save();
     }

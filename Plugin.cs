@@ -7,6 +7,8 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using QuestTextRecolor.Windows;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using System.Threading.Tasks;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace QuestTextRecolor;
 
@@ -27,10 +29,15 @@ public sealed class Plugin : IDalamudPlugin
     private const string CommandName = "/questtext";
 
     public Configuration Configuration { get; init; }
+    
+    private TestPopupWindow TestPopupWindow { get; init; }
+
 
     public readonly WindowSystem WindowSystem = new("Quest Text Recolor");
 
     private ConfigWindow ConfigWindow { get; init; }
+
+
 
     public Plugin()
     {
@@ -38,9 +45,11 @@ public sealed class Plugin : IDalamudPlugin
             PluginInterface.GetPluginConfig() as Configuration
             ?? new Configuration();
 
-    ConfigWindow = new ConfigWindow(this);
+        ConfigWindow = new ConfigWindow(this);
+            WindowSystem.AddWindow(ConfigWindow);
 
-        WindowSystem.AddWindow(ConfigWindow);
+        TestPopupWindow = new TestPopupWindow(Configuration);
+            WindowSystem.AddWindow(TestPopupWindow);
 
         CommandManager.AddHandler(
             CommandName,
@@ -50,9 +59,11 @@ public sealed class Plugin : IDalamudPlugin
             }
         );
 
+        
         PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
         PluginInterface.UiBuilder.OpenMainUi += ToggleConfigUi;
+
 
         AddonLifecycle.RegisterListener(
         AddonEvent.PostUpdate,
@@ -71,7 +82,11 @@ public sealed class Plugin : IDalamudPlugin
 
         WindowSystem.RemoveAllWindows();
 
+        TestPopupWindow.Dispose();
+
         ConfigWindow.Dispose();
+
+        TestPopupWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
     }
@@ -84,6 +99,11 @@ public sealed class Plugin : IDalamudPlugin
     public void ToggleConfigUi()
     {
         ConfigWindow.Toggle();
+    }
+
+    public void ShowTestPopup()
+    {
+        TestPopupWindow.Show();
     }
 
     private unsafe void OnScreenTextPostUpdate(AddonEvent type, AddonArgs args)
@@ -132,7 +152,7 @@ public sealed class Plugin : IDalamudPlugin
 
             foundCount++;
 
-            textNode->FontSize = 18;
+            textNode->FontSize = (byte)Configuration.QuestFontSize;
 
             textNode->TextColor.R = (byte)(textColor.X * 255f);
             textNode->TextColor.G = (byte)(textColor.Y * 255f);
