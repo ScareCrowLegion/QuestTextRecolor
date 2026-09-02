@@ -2,6 +2,23 @@
 
 Quest Text Recolor is a Dalamud plugin for Final Fantasy XIV that allows you to customize center-screen quest objective text.
 
+## Quest Popup Textures
+
+Quest Text Recolor can optionally replace the quest popup UI textures through Penumbra.
+
+Supported textures:
+
+- `ui/uld/ScreenInfo_hr1.tex`
+- `ui/icon/060000/060081_hr1.tex`
+
+### Requirements
+
+- Penumbra must be installed and available.
+- Enable **Custom Quest Popup Textures** in the plugin configuration.
+- Restart FFXIV after enabling or disabling the texture replacement.
+
+The standard quest text recoloring features do not require Penumbra.
+
 ## Features
 
 - Customize quest objective text color

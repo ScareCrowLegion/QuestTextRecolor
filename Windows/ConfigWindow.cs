@@ -7,33 +7,25 @@ namespace QuestTextRecolor.Windows;
 
 public class ConfigWindow : Window
 {
-    private readonly Configuration configuration;
     private readonly Plugin plugin;
-
+    private readonly Configuration configuration;
 
     public ConfigWindow(Plugin plugin)
-        : base("Quest Text Recolor###QuestTextRecolorConfig")
+        : base("Quest Text Recolor")
     {
         this.plugin = plugin;
+        configuration = plugin.Configuration;
 
         Flags = ImGuiWindowFlags.NoResize |
                 ImGuiWindowFlags.NoCollapse;
 
         Size = new Vector2(500, 520);
         SizeCondition = ImGuiCond.Always;
-
-        configuration = plugin.Configuration;
     }
 
     public override void Draw()
     {
-        DrawHeader();
-
-        ImGui.Spacing();
-        ImGui.Separator();
-        ImGui.Spacing();
-
-        DrawEnableSection();
+        DrawPluginSection();
 
         ImGui.Spacing();
         ImGui.Separator();
@@ -45,7 +37,7 @@ public class ConfigWindow : Window
         ImGui.Separator();
         ImGui.Spacing();
 
-        DrawFontSection();
+        DrawTextStyleSection();
 
         ImGui.Spacing();
         ImGui.Separator();
@@ -57,29 +49,24 @@ public class ConfigWindow : Window
         ImGui.Separator();
         ImGui.Spacing();
 
-        DrawTestSection();
+        DrawTextureSection();
+
         ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
 
+        DrawTestSection();
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
 
         DrawResetSection();
     }
 
-    private void DrawHeader()
-    {
-        ImGui.Text("Quest Text Recolor");
-
-        ImGui.TextDisabled(
-            "Customize center-screen quest objective text colors."
-        );
-    }
-
-    private void DrawEnableSection()
+    private void DrawPluginSection()
     {
         ImGui.Text("Plugin");
-
-        ImGui.Spacing();
 
         var enabled = configuration.EnableQuestTextRecolor;
 
@@ -90,7 +77,7 @@ public class ConfigWindow : Window
         }
 
         ImGui.TextDisabled(
-            "Controls whether custom quest text colors are applied."
+            "Recolors the center-screen quest objective progression text."
         );
     }
 
@@ -98,13 +85,9 @@ public class ConfigWindow : Window
     {
         ImGui.Text("Colors");
 
-        ImGui.Spacing();
-
         var textColor = configuration.QuestTextColor;
 
-        ImGui.SetNextItemWidth(180);
-
-        if (ImGui.ColorEdit4("Quest Text Color", ref textColor))
+        if (ImGui.ColorEdit4("Text Color", ref textColor))
         {
             configuration.QuestTextColor = textColor;
             configuration.Save();
@@ -116,9 +99,7 @@ public class ConfigWindow : Window
 
         var edgeColor = configuration.QuestEdgeColor;
 
-        ImGui.SetNextItemWidth(180);
-
-        if (ImGui.ColorEdit4("Quest Edge Color", ref edgeColor))
+        if (ImGui.ColorEdit4("Edge Color", ref edgeColor))
         {
             configuration.QuestEdgeColor = edgeColor;
             configuration.Save();
@@ -127,36 +108,11 @@ public class ConfigWindow : Window
         ImGui.TextDisabled("Plugin Default: #5A4526FF");
     }
 
-    private void DrawTestSection()
-    {
-        ImGui.Text("In-Game Preview");
-
-        ImGui.Spacing();
-
-        ImGui.TextDisabled(
-            "Preview your current colors and font size on screen."
-        );
-
-        ImGui.Spacing();
-
-        if (ImGui.Button("Show Test Popup"))
-        {
-            plugin.ShowTestPopup();
-        }
-
-        ImGui.SameLine();
-
-        ImGui.TextDisabled("Displays for 4 seconds.");
-    }
-    private void DrawFontSection()
+    private void DrawTextStyleSection()
     {
         ImGui.Text("Text Style");
 
-        ImGui.Spacing();
-
         var fontSize = configuration.QuestFontSize;
-
-        ImGui.SetNextItemWidth(180);
 
         if (ImGui.SliderInt("Font Size", ref fontSize, 12, 28))
         {
@@ -171,69 +127,175 @@ public class ConfigWindow : Window
     {
         ImGui.Text("Presets");
 
-        ImGui.Spacing();
-
-        // Row 1
         if (ImGui.Button("Plugin Default", new Vector2(140, 0)))
         {
-            ApplyPreset(
-                new Vector4(242f / 255f, 228f / 255f, 196f / 255f, 1.0f),
-                new Vector4(90f / 255f, 69f / 255f, 38f / 255f, 1.0f)
+            configuration.QuestTextColor = new Vector4(
+                242f / 255f,
+                228f / 255f,
+                196f / 255f,
+                1.0f
             );
+
+            configuration.QuestEdgeColor = new Vector4(
+                90f / 255f,
+                69f / 255f,
+                38f / 255f,
+                1.0f
+            );
+
+            configuration.Save();
         }
 
         ImGui.SameLine();
 
         if (ImGui.Button("FFXIV Original", new Vector2(140, 0)))
         {
-            ApplyPreset(
-                new Vector4(1.0f, 1.0f, 1.0f, 1.0f),
-                new Vector4(0f / 255f, 153f / 255f, 255f / 255f, 1.0f)
+            configuration.QuestTextColor = new Vector4(
+                1.0f,
+                1.0f,
+                1.0f,
+                1.0f
             );
+
+            configuration.QuestEdgeColor = new Vector4(
+                0f / 255f,
+                153f / 255f,
+                255f / 255f,
+                1.0f
+            );
+
+            configuration.Save();
         }
 
-        // Row 2
         if (ImGui.Button("FFXIV Gold", new Vector2(140, 0)))
         {
-            ApplyPreset(
-                new Vector4(232f / 255f, 196f / 255f, 110f / 255f, 1.0f),
-                new Vector4(76f / 255f, 49f / 255f, 20f / 255f, 1.0f)
+            configuration.QuestTextColor = new Vector4(
+                232f / 255f,
+                196f / 255f,
+                110f / 255f,
+                1.0f
             );
+
+            configuration.QuestEdgeColor = new Vector4(
+                76f / 255f,
+                49f / 255f,
+                20f / 255f,
+                1.0f
+            );
+
+            configuration.Save();
         }
 
         ImGui.SameLine();
 
         if (ImGui.Button("High Contrast", new Vector2(140, 0)))
         {
-            ApplyPreset(
-                new Vector4(245f / 255f, 245f / 255f, 245f / 255f, 1.0f),
-                new Vector4(20f / 255f, 20f / 255f, 20f / 255f, 1.0f)
+            configuration.QuestTextColor = new Vector4(
+                245f / 255f,
+                245f / 255f,
+                245f / 255f,
+                1.0f
             );
+
+            configuration.QuestEdgeColor = new Vector4(
+                20f / 255f,
+                20f / 255f,
+                20f / 255f,
+                1.0f
+            );
+
+            configuration.Save();
         }
 
-        // Row 3
         if (ImGui.Button("Cool Blue", new Vector2(140, 0)))
         {
-            ApplyPreset(
-                new Vector4(190f / 255f, 220f / 255f, 255f / 255f, 1.0f),
-                new Vector4(25f / 255f, 55f / 255f, 95f / 255f, 1.0f)
+            configuration.QuestTextColor = new Vector4(
+                190f / 255f,
+                220f / 255f,
+                255f / 255f,
+                1.0f
             );
-        }
 
-        ImGui.Spacing();
+            configuration.QuestEdgeColor = new Vector4(
+                25f / 255f,
+                55f / 255f,
+                95f / 255f,
+                1.0f
+            );
+
+            configuration.Save();
+        }
 
         ImGui.TextDisabled(
             "Presets update both text and edge colors."
         );
     }
 
-    private void ApplyPreset(Vector4 textColor, Vector4 edgeColor)
+    private void DrawTextureSection()
     {
-        configuration.QuestTextColor = textColor;
-        configuration.QuestEdgeColor = edgeColor;
-        configuration.Save();
+        ImGui.Text("Quest Popup Textures");
+
+        ImGui.Spacing();
+
+        var penumbraAvailable = plugin.Penumbra.IsAvailable();
+
+        if (penumbraAvailable)
+        {
+            ImGui.Text("Penumbra: Available");
+        }
+        else
+        {
+            ImGui.TextDisabled("Penumbra: Not Available");
+        }
+
+        ImGui.Spacing();
+
+        var enabled = configuration.EnableQuestPopupTextures;
+
+        ImGui.BeginDisabled(!penumbraAvailable);
+
+        if (ImGui.Checkbox(
+            "Enable Custom Quest Popup Textures",
+            ref enabled))
+        {
+            configuration.EnableQuestPopupTextures = enabled;
+            configuration.Save();
+
+            if (enabled)
+            {
+                plugin.Penumbra.ApplyQuestPopupTextures();
+            }
+            else
+            {
+                plugin.Penumbra.RemoveQuestPopupTextures();
+            }
+        }
+
+        ImGui.EndDisabled();
+
+        ImGui.TextDisabled("Requires Penumbra.");
+        ImGui.TextDisabled("Restart FFXIV after enabling or disabling.");
     }
 
+
+
+    private void DrawTestSection()
+    {
+        ImGui.Text("In-Game Preview");
+
+        ImGui.TextDisabled(
+            "Preview your current colors and font size on screen."
+        );
+
+        if (ImGui.Button("Show Test Popup"))
+        {
+            plugin.ShowTestPopup();
+        }
+
+        ImGui.SameLine();
+
+        ImGui.TextDisabled("Displays for 4 seconds.");
+    }
 
     private void DrawResetSection()
     {

@@ -7,6 +7,8 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using QuestTextRecolor.Windows;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using QuestTextRecolor.Services;
+
 
 namespace QuestTextRecolor;
 
@@ -27,6 +29,7 @@ public sealed class Plugin : IDalamudPlugin
     
     private TestPopupWindow TestPopupWindow { get; init; }
 
+    internal PenumbraService Penumbra { get; }
 
     public readonly WindowSystem WindowSystem = new("Quest Text Recolor");
 
@@ -41,10 +44,18 @@ public sealed class Plugin : IDalamudPlugin
             ?? new Configuration();
 
         ConfigWindow = new ConfigWindow(this);
-            WindowSystem.AddWindow(ConfigWindow);
+        WindowSystem.AddWindow(ConfigWindow);
 
         TestPopupWindow = new TestPopupWindow(Configuration);
-            WindowSystem.AddWindow(TestPopupWindow);
+        WindowSystem.AddWindow(TestPopupWindow);
+
+        Penumbra = new PenumbraService(PluginInterface);
+
+        if (Configuration.EnableQuestPopupTextures &&
+            Penumbra.IsAvailable())
+        {
+            Penumbra.ApplyQuestPopupTextures();
+        }
 
         CommandManager.AddHandler(
             CommandName,
@@ -54,26 +65,32 @@ public sealed class Plugin : IDalamudPlugin
             }
         );
 
-        
-        PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
-        PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
-        PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;
+
+        PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
+        PluginInterface.UiBuilder.OpenMainUi += ToggleConfigUi;
 
 
         AddonLifecycle.RegisterListener(
-        AddonEvent.PostUpdate,
-        "_ScreenText",
-        OnScreenTextPostUpdate
+            AddonEvent.PostUpdate,
+            "_ScreenText",
+            OnScreenTextPostUpdate
 );
     }
 
     public void Dispose()
     {
+        if (Configuration.EnableQuestPopupTextures &&
+            Penumbra.IsAvailable())
+        {
+            Penumbra.RemoveQuestPopupTextures();
+        }
+
         AddonLifecycle.UnregisterListener(OnScreenTextPostUpdate);
 
-        PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
-        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
-        PluginInterface.UiBuilder.OpenMainUi += ToggleConfigUi;
+        PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
+        PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
+        PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;
 
         WindowSystem.RemoveAllWindows();
 

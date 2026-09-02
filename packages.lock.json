@@ -13,6 +13,12 @@
         "requested": "[1.2.39, )",
         "resolved": "1.2.39",
         "contentHash": "fcFN01tDTIQqDuTwr1jUQK/geofiwjG5DycJQOnC72i1SsLAk1ELe+apBOuZ11UMQG8YKFZG1FgvjZPbqHyatg=="
+      },
+      "Penumbra.Api": {
+        "type": "Direct",
+        "requested": "[5.13.1, )",
+        "resolved": "5.13.1",
+        "contentHash": "kmpqhcbnnF+Ib0F9g7+1W17IbZ8Q8G2zn3MJURd/rmQiB3D7cm8YS2JRmvhDzrN5w9OMlfq7MFxVtwG419YkIA=="
       }
     }
   }

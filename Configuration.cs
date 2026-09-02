@@ -11,6 +11,8 @@ public class Configuration : IPluginConfiguration
 
     public bool EnableQuestTextRecolor { get; set; } = true;
 
+    public bool EnableQuestPopupTextures { get; set; } = false;
+
     public int QuestFontSize { get; set; } = 18;
 
     public Vector4 QuestTextColor { get; set; } = new Vector4(

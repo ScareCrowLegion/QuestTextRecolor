@@ -2,28 +2,44 @@
 
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
 
-  <PropertyGroup>
+	<PropertyGroup>
 
-    <Version>1.1.0.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+		<Version>1.2.0.0</Version>
+		<AssemblyVersion>1.2.0.0</AssemblyVersion>
+		<FileVersion>1.2.0.0</FileVersion>
 
-	  <AssemblyName>QuestTextRecolor</AssemblyName>
-	  <RootNamespace>QuestTextRecolor</RootNamespace>
+		<AssemblyName>QuestTextRecolor</AssemblyName>
+		<RootNamespace>QuestTextRecolor</RootNamespace>
 
-    <Author>ScareCrowLegion</Author>
-    <Name>Quest Text Recolor</Name>
+		<Author>ScareCrowLegion</Author>
+		<Name>Quest Text Recolor</Name>
 
-    <Punchline>Customize quest objective text colors.</Punchline>
+		<Punchline>Customize quest objective text colors.</Punchline>
 
-    <Description>
-      Customize the color and outline of FFXIV quest objective text shown in the center-screen quest progression popup.
-    </Description>
+		<Description>
+			Customize the color and outline of FFXIV quest objective text shown in the center-screen quest progression popup.
+		</Description>
 
-    <RepoUrl>https://github.com/ScareCrowLegion/QuestTextRecolor</RepoUrl>
+		<RepoUrl>https://github.com/ScareCrowLegion/QuestTextRecolor</RepoUrl>
 
-    <Tags>ui;quest;text;customization</Tags>
+		<Tags>ui;quest;text;customization</Tags>
 
-  </PropertyGroup>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Penumbra.Api" Version="5.13.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resources\Textures\ScreenInfo_hr1.tex">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resources\Textures\060081_hr1.tex">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
 
 </Project>
