@@ -3,7 +3,7 @@
     "Author": "ScareCrowLegion",
     "Name": "Quest Text Recolor",
     "InternalName": "QuestTextRecolor",
-    "AssemblyVersion": "1.1.0.0",
+    "AssemblyVersion": "1.2.0.0",
     "Description": "Customize the color and outline of FFXIV quest objective text shown in the center-screen quest progression popup.",
     "ApplicableVersion": "any",
     "RepoUrl": "https://github.com/ScareCrowLegion/QuestTextRecolor",
@@ -18,9 +18,9 @@
     "Punchline": "Customize quest objective text colors.",
     "IsHide": false,
     "IsTestingExclusive": false,
-    "DownloadLinkInstall": "https://github.com/ScareCrowLegion/QuestTextRecolor/releases/download/v1.1.0/QuestTextRecolor.zip",
-    "DownloadLinkUpdate": "https://github.com/ScareCrowLegion/QuestTextRecolor/releases/download/v1.1.0/QuestTextRecolor.zip",
-    "LastUpdate": 1788263940
+    "DownloadLinkInstall": "https://github.com/ScareCrowLegion/QuestTextRecolor/releases/download/v1.2.0/QuestTextRecolor.zip",
+    "DownloadLinkUpdate": "https://github.com/ScareCrowLegion/QuestTextRecolor/releases/download/v1.2.0/QuestTextRecolor.zip",
+    "LastUpdate": 1788525939
 
   }
 ]
