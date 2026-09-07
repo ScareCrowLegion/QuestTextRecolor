@@ -90,6 +90,28 @@ class TestPopupWindow : Window
             ImGui.ColorConvertFloat4ToU32(configuration.QuestEdgeColor);
 
         // Outline
+        var outlineRadius = MathF.Max(1.5f, fontSize * 0.10f);
+        const int outlineSamples = 16;
+
+        for (var i = 0; i < outlineSamples; i++)
+        {
+            var angle =
+                (MathF.PI * 2f * i) / outlineSamples;
+
+            var offset = new Vector2(
+                MathF.Cos(angle) * outlineRadius,
+                MathF.Sin(angle) * outlineRadius
+            );
+
+            drawList.AddText(
+                font,
+                fontSize,
+                position + offset,
+                edgeColor,
+                testText
+            );
+        }
+
         drawList.AddText(
             font,
             fontSize,
