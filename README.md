@@ -21,14 +21,46 @@ The standard quest text recoloring features do not require Penumbra.
 
 ## Features
 
-- Customize quest objective text color
-- Customize quest objective outline color
-- Adjust quest objective font size
-- Enable or disable recoloring
-- Built-in color presets
-- In-game preview popup
-- Reset appearance to plugin defaults
-- Settings save automatically
+Quest Text Recolor lets you customize the center-screen quest progression popup in FFXIV.
+
+### Text Customization
+
+* Custom quest objective text color
+* Custom outline / edge color
+* Adjustable font size
+* Built-in appearance presets
+* In-game preview popup
+* Reset appearance to plugin defaults
+
+These features work without Penumbra.
+
+### Optional Quest Popup Textures
+
+Quest Text Recolor can also replace selected quest popup textures through Penumbra.
+
+Currently supported texture replacements:
+
+* `ui/uld/ScreenInfo_hr1.tex`
+* `ui/icon/060000/060081_hr1.tex`
+
+The plugin automatically uses your Default Penumbra collection when applying these replacements.
+
+Penumbra is only required for this optional texture replacement feature. Normal text recoloring and font customization continue to work without Penumbra.
+
+A full FFXIV restart is recommended after enabling or disabling quest popup texture replacement.
+
+## Requirements
+
+* Dalamud API 15
+* Penumbra only if using the optional Quest Popup Textures feature
+
+## Configuration
+
+Open the plugin configuration with:
+
+`/questtext`
+
+From the configuration window you can adjust text colors, edge colors, font size, presets, popup textures, and use the built-in preview.
 
 ## Presets
 
