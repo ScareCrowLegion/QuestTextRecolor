@@ -242,10 +242,12 @@ public class ConfigWindow : Window
         if (penumbraAvailable)
         {
             ImGui.Text("Penumbra: Available");
+            ImGui.TextDisabled("Custom quest popup textures can be appiled through Penumbra.");
         }
         else
         {
             ImGui.TextDisabled("Penumbra: Not Available");
+            ImGui.TextDisabled("Install and enable Penumbra to use custom quest popup textures.");
         }
 
         ImGui.Spacing();
@@ -273,8 +275,8 @@ public class ConfigWindow : Window
 
         ImGui.EndDisabled();
 
-        ImGui.TextDisabled("Requires Penumbra.");
-        ImGui.TextDisabled("Restart FFXIV after enabling or disabling.");
+        ImGui.TextDisabled("Penumbra is only required for the optional texture replacement feature.");
+        ImGui.TextDisabled("A full FFXIV restart is recommmended after enabling or disabling textures.");
     }
 
 
