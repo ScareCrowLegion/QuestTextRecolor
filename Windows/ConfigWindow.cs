@@ -159,9 +159,26 @@ public class ConfigWindow : Window
             configuration.Save();
         }
 
+        var scale = configuration.QuestPopupScale;
+
+        if (ImGui.SliderFloat(
+            "Popup Scale",
+            ref scale,
+            0.75f,
+            1.50f,
+            "%.2f"))
+        {
+            configuration.QuestPopupScale = scale;
+            configuration.Save();
+        }
+
+        ImGui.TextDisabled(
+            "1.00 - 100% of the default popup size."
+        );
+
         ImGui.TextDisabled(
             "Offsets are measured in pixels from the default quest popup position."
-            );
+        );
 
         if (ImGui.Button("Reset Position"))
         {

@@ -18,6 +18,8 @@ public class Configuration : IPluginConfiguration
     public float QuestPopupOffsetX { get; set; } = 0f;
     public float QuestPopupOffsetY { get; set; } = 0f;
 
+    public float QuestPopupScale { get; set; } = 1.0f;
+
     public Vector4 QuestTextColor { get; set; } = new Vector4(
         242f / 255f,
         228f / 255f,

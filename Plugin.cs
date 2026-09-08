@@ -28,7 +28,6 @@ public sealed class Plugin : IDalamudPlugin
     private float lastAppliedOffsetX = 0f;
     private float lastAppliedOffsetY = 0f;
 
-
     public Configuration Configuration { get; init; }
 
     private TestPopupWindow TestPopupWindow { get; init; }
@@ -149,7 +148,6 @@ public sealed class Plugin : IDalamudPlugin
         var textColor = Configuration.QuestTextColor;
         var edgeColor = Configuration.QuestEdgeColor;
 
-
         for (int i = 0; i < addon->UldManager.NodeListCount; i++)
         {
             var topNode = addon->UldManager.NodeList[i];
@@ -174,6 +172,13 @@ public sealed class Plugin : IDalamudPlugin
                 continue;
 
             var textNode = (AtkTextNode*)node;
+
+            if (topNode->X != 0f || topNode->Y != 0f)
+            {
+                var popupScale = Configuration.QuestPopupScale;
+
+                topNode->SetScale(popupScale, popupScale);
+            }
 
             textNode->FontSize = (byte)Configuration.QuestFontSize;
 
