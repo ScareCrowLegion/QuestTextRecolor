@@ -159,31 +159,28 @@ public class ConfigWindow : Window
             configuration.Save();
         }
 
-        var scale = configuration.QuestPopupScale;
+        var scalePercent = configuration.QuestPopupScale * 100f;
 
         if (ImGui.SliderFloat(
             "Popup Scale",
-            ref scale,
-            0.75f,
-            1.50f,
-            "%.2f"))
+            ref scalePercent,
+            75f,
+            150f,
+            "%.0f%%"))
         {
-            configuration.QuestPopupScale = scale;
+            configuration.QuestPopupScale = scalePercent / 100f;
             configuration.Save();
         }
 
         ImGui.TextDisabled(
-            "1.00 - 100% of the default popup size."
+            "Offsets are measured in pixels from the default FFXIV popup layout."
         );
 
-        ImGui.TextDisabled(
-            "Offsets are measured in pixels from the default quest popup position."
-        );
-
-        if (ImGui.Button("Reset Position"))
+        if (ImGui.Button("Reset Layout"))
         {
             configuration.QuestPopupOffsetX = 0f;
             configuration.QuestPopupOffsetY = 0f;
+            configuration.QuestPopupScale = 1.0f;
             configuration.Save();
         }
     }
