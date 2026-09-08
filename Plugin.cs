@@ -25,8 +25,12 @@ public sealed class Plugin : IDalamudPlugin
 
     private const string CommandName = "/questtext";
 
+    private float lastAppliedOffsetX = 0f;
+    private float lastAppliedOffsetY = 0f;
+
+
     public Configuration Configuration { get; init; }
-    
+
     private TestPopupWindow TestPopupWindow { get; init; }
 
     internal PenumbraService Penumbra { get; }
@@ -35,8 +39,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private ConfigWindow ConfigWindow { get; init; }
 
-
-
+ 
     public Plugin()
     {
         Configuration =
@@ -126,8 +129,26 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
+        var offsetX = Configuration.QuestPopupOffsetX;
+        var offsetY = Configuration.QuestPopupOffsetY;
+
+        var deltaX = offsetX - lastAppliedOffsetX;
+        var deltaY = offsetY - lastAppliedOffsetY;
+
+        if (deltaX != 0f || deltaY != 0f)
+        {
+            var newX = (short)(addon->X + deltaX);
+            var newY = (short)(addon->Y + deltaY);
+
+            addon->SetPosition(newX, newY);
+
+            lastAppliedOffsetX = offsetX;
+            lastAppliedOffsetY = offsetY;
+        }
+
         var textColor = Configuration.QuestTextColor;
         var edgeColor = Configuration.QuestEdgeColor;
+
 
         for (int i = 0; i < addon->UldManager.NodeListCount; i++)
         {

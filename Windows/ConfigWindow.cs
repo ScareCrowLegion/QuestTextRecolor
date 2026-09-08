@@ -43,6 +43,12 @@ public class ConfigWindow : Window
         ImGui.Separator();
         ImGui.Spacing();
 
+        DrawPositionSection();
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
+
         DrawPresetSection();
 
         ImGui.Spacing();
@@ -121,6 +127,48 @@ public class ConfigWindow : Window
         }
 
         ImGui.TextDisabled("Plugin Default: 18");
+    }
+
+    private void DrawPositionSection()
+    {
+        ImGui.Text("Popup Position");
+
+        var offsetX = configuration.QuestPopupOffsetX;
+
+        if (ImGui.SliderFloat(
+            "Horizontal Offset",
+            ref offsetX,
+            -500f,
+            500f,
+            "%.0f px"))
+        {
+            configuration.QuestPopupOffsetX = offsetX;
+            configuration.Save();
+        }
+
+        var offsetY = configuration.QuestPopupOffsetY;
+
+        if (ImGui.SliderFloat(
+            "Vertical Offset",
+            ref offsetY,
+            -300f,
+            300f,
+            "%.0f px"))
+        {
+            configuration.QuestPopupOffsetY = offsetY;
+            configuration.Save();
+        }
+
+        ImGui.TextDisabled(
+            "Offsets are measured in pixels from the default quest popup position."
+            );
+
+        if (ImGui.Button("Reset Position"))
+        {
+            configuration.QuestPopupOffsetX = 0f;
+            configuration.QuestPopupOffsetY = 0f;
+            configuration.Save();
+        }
     }
 
     private void DrawPresetSection()
