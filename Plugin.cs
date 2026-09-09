@@ -8,6 +8,7 @@ using QuestTextRecolor.Windows;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using QuestTextRecolor.Services;
+using System;
 
 
 namespace QuestTextRecolor;
@@ -22,6 +23,9 @@ public sealed class Plugin : IDalamudPlugin
 
     [PluginService]
     internal static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
+
+    [PluginService]
+    internal static ITextureProvider TextureProvider { get; private set; } = null!;
 
     private const string CommandName = "/questtext";
 
@@ -41,6 +45,7 @@ public sealed class Plugin : IDalamudPlugin
  
     public Plugin()
     {
+
         Configuration =
             PluginInterface.GetPluginConfig() as Configuration
             ?? new Configuration();
@@ -128,8 +133,8 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
-        var offsetX = Configuration.QuestPopupOffsetX;
-        var offsetY = Configuration.QuestPopupOffsetY;
+        var offsetX = MathF.Round(Configuration.QuestPopupOffsetX);
+        var offsetY = MathF.Round(Configuration.QuestPopupOffsetY);
 
         var deltaX = offsetX - lastAppliedOffsetX;
         var deltaY = offsetY - lastAppliedOffsetY;

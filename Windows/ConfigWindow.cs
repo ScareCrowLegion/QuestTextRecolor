@@ -1,6 +1,8 @@
+using System.IO;
 using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
+
 
 namespace QuestTextRecolor.Windows;
 
@@ -485,6 +487,26 @@ public class ConfigWindow : Window
 
         ImGui.Spacing();
 
+        DrawTexturePreview(
+            "Quest Popup Frame",
+            "ScreenInfo_Preview.png",
+            420f
+          );
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
+
+        DrawTexturePreview(
+            "Stage Progression Complete Icon",
+            "060081_hr1_preview.png",
+            120f
+         );
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
+
         var penumbraAvailable =
             plugin.Penumbra.IsAvailable();
 
@@ -597,18 +619,81 @@ public class ConfigWindow : Window
         );
     }
 
+    private void DrawTexturePreview(
+    string label,
+    string fileName,
+    float maxWidth)
+    {
+        ImGui.Text(label);
+        ImGui.Spacing();
+
+        var assemblyDirectory =
+            Plugin.PluginInterface.AssemblyLocation.DirectoryName;
+
+        if (assemblyDirectory == null)
+        {
+            ImGui.TextDisabled("Preview unavailable.");
+            return;
+        }
+
+        var previewPath = Path.Combine(
+            assemblyDirectory,
+            "Resources",
+            "Previews",
+            fileName
+        );
+
+        var sharedTexture =
+            Plugin.TextureProvider.GetFromFile(previewPath);
+
+        if (sharedTexture == null)
+        {
+            ImGui.TextDisabled("Preview unavailable.");
+            return;
+        }
+
+        var texture = sharedTexture.GetWrapOrEmpty();
+
+        var size = texture.Size;
+
+        var scale = 1f;
+
+        if (size.X > maxWidth)
+        {
+            scale = maxWidth / size.X;
+        }
+
+        var displaySize = new Vector2(
+            size.X * scale,
+            size.Y * scale
+        );
+
+        ImGui.Image(
+            texture.Handle,
+            displaySize
+        );
+    }
+
+
     private void DrawAboutSection()
     {
         ImGui.Text("Quest Text Recolor");
 
         ImGui.Spacing();
 
-        ImGui.TextWrapped(
+        ImGui.PushTextWrapPos(0f);
+        ImGui.TextDisabled(
             "Customize FFXIV's center-screen quest objective progression text and popup layout."
         );
+        ImGui.PopTextWrapPos();
 
         ImGui.Spacing();
         ImGui.Separator();
+        ImGui.Spacing();
+
+        ImGui.Text("Version");
+        ImGui.TextDisabled("1.3.0");
+
         ImGui.Spacing();
 
         ImGui.Text("Command");
@@ -628,8 +713,6 @@ public class ConfigWindow : Window
             "Only required for the optional custom quest popup textures."
         );
 
-        ImGui.TextDisabled(
-            "Additional About information will be added during the v1.3.0 polish pass."
-        );
     }
+
 }

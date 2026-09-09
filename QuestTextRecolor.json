@@ -1,8 +1,8 @@
 {
   "Author": "ScareCrowLegion",
   "Name": "Quest Text Recolor",
-  "Punchline": "Customize quest objective text colors.",
-  "Description": "Customize the color and outline of FFXIV quest objective text shown in the center-screen quest progression popup.",
+  "Punchline": "Customize quest objective text and popup layout.",
+  "Description": "Customize FFXIV's center-screen quest objective popup with custom text colors, font size, position, scale, presets, and optional Penumbra-based textures.",
   "RepoUrl": "https://github.com/ScareCrowLegion/QuestTextRecolor",
   "IconUrl": "https://raw.githubusercontent.com/ScareCrowLegion/QuestTextRecolor/main/icon.png",
   "Tags": [
