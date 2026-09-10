@@ -691,8 +691,14 @@ public class ConfigWindow : Window
         ImGui.Separator();
         ImGui.Spacing();
 
+        var version = typeof(Plugin).Assembly.GetName().Version;
+
+        var versionText = version == null
+            ? "Unkown"
+            : $"{version.Major}.{version.Minor}.{version.Build}";
+
         ImGui.Text("Version");
-        ImGui.TextDisabled("1.3.0");
+        ImGui.TextDisabled(versionText);
 
         ImGui.Spacing();
 

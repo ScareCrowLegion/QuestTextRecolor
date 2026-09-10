@@ -7,18 +7,27 @@ namespace QuestTextRecolor;
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
+    public const int DefaultQuestFontSize = 18;
+
+    public const float DefaultQuestPopupScale = 1.0f;
+
+    public const float DefaultQuestPopupOffsetX = 0f;
+
+    public const float DefaultQuestPopupOffsetY = 0f;
+
     public int Version { get; set; } = 0;
 
     public bool EnableQuestTextRecolor { get; set; } = true;
 
     public bool EnableQuestPopupTextures { get; set; } = false;
+    
 
-    public int QuestFontSize { get; set; } = 18;
+    public int QuestFontSize { get; set; } = DefaultQuestFontSize;
 
-    public float QuestPopupOffsetX { get; set; } = 0f;
-    public float QuestPopupOffsetY { get; set; } = 0f;
+    public float QuestPopupOffsetX { get; set; } = DefaultQuestPopupOffsetX;
+    public float QuestPopupOffsetY { get; set; } = DefaultQuestPopupOffsetY;
 
-    public float QuestPopupScale { get; set; } = 1.0f;
+    public float QuestPopupScale { get; set; } = DefaultQuestPopupScale;
 
     public Vector4 QuestTextColor { get; set; } = new Vector4(
         242f / 255f,
@@ -55,7 +64,7 @@ public class Configuration : IPluginConfiguration
             1.0f
         );
 
-        QuestFontSize = 18;
+        QuestFontSize = DefaultQuestFontSize;
 
         Save();
     }
