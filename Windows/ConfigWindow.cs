@@ -334,10 +334,7 @@ public class ConfigWindow : Window
 
         if (ImGui.Button("Reset Layout"))
         {
-            configuration.QuestPopupOffsetX = 0f;
-            configuration.QuestPopupOffsetY = 0f;
-            configuration.QuestPopupScale = 1.0f;
-            configuration.Save();
+            configuration.ResetLayout();
         }
     }
 
@@ -355,21 +352,9 @@ public class ConfigWindow : Window
             "Plugin Default",
             new Vector2(140, 0)))
         {
-            configuration.QuestTextColor =
-                new Vector4(
-                    242f / 255f,
-                    228f / 255f,
-                    196f / 255f,
-                    1.0f
-                );
+            configuration.QuestTextColor = Configuration.DefaultQuestTextColor;
 
-            configuration.QuestEdgeColor =
-                new Vector4(
-                    90f / 255f,
-                    69f / 255f,
-                    38f / 255f,
-                    1.0f
-                );
+            configuration.QuestEdgeColor = Configuration.DefaultQuestEdgeColor;
 
             configuration.Save();
         }
