@@ -256,8 +256,9 @@ public class ConfigWindow : Window
         if (ImGui.SliderInt(
             "Font Size",
             ref fontSize,
-            12,
-            28))
+            Configuration.MinQuestFontSize,
+            Configuration.MaxQuestFontSize))
+
         {
             configuration.QuestFontSize = fontSize;
             configuration.Save();
@@ -283,8 +284,8 @@ public class ConfigWindow : Window
         if (ImGui.SliderFloat(
             "Horizontal Offset",
             ref offsetX,
-            -500f,
-            500f,
+            Configuration.MinQuestPopupOffsetX,
+            Configuration.MaxQuestPopupOffsetX,
             "%.0f px"))
         {
             configuration.QuestPopupOffsetX = offsetX;
@@ -296,8 +297,8 @@ public class ConfigWindow : Window
         if (ImGui.SliderFloat(
             "Vertical Offset",
             ref offsetY,
-            -300f,
-            300f,
+            Configuration.MinQuestPopupOffsetY,
+            Configuration.MaxQuestPopupOffsetY,
             "%.0f px"))
         {
             configuration.QuestPopupOffsetY = offsetY;
@@ -310,9 +311,9 @@ public class ConfigWindow : Window
         if (ImGui.SliderFloat(
             "Popup Scale",
             ref scalePercent,
-            75f,
-            150f,
-            "%.0f%%"))
+            Configuration.MinQuestPopupScale * 100f,
+            Configuration.MaxQuestPopupScale * 100f,
+            "%.0f%"))
         {
             configuration.QuestPopupScale =
                 scalePercent / 100f;

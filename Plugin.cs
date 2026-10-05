@@ -50,6 +50,11 @@ public sealed class Plugin : IDalamudPlugin
             PluginInterface.GetPluginConfig() as Configuration
             ?? new Configuration();
 
+        if (Configuration.Validate())
+        {
+            Configuration.Save();
+        }
+
         ConfigWindow = new ConfigWindow(this);
         WindowSystem.AddWindow(ConfigWindow);
 

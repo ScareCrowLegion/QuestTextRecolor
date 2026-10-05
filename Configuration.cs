@@ -1,6 +1,9 @@
 using Dalamud.Configuration;
+using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
+using Penumbra.Api.IpcSubscribers;
 using System;
 using System.Numerics;
+using System.Threading.Channels;
 
 namespace QuestTextRecolor;
 
@@ -9,11 +12,28 @@ public class Configuration : IPluginConfiguration
 {
     public const int DefaultQuestFontSize = 18;
 
+    public const int MinQuestFontSize = 12;
+
+    public const int MaxQuestFontSize = 28;
+
     public const float DefaultQuestPopupScale = 1.0f;
+
+    public const float MinQuestPopupScale = 0.75f;
+
+    public const float MaxQuestPopupScale = 1.50f;
 
     public const float DefaultQuestPopupOffsetX = 0f;
 
+    public const float MinQuestPopupOffsetX = -500f;
+
+    public const float MaxQuestPopupOffsetX = 500f;
+
     public const float DefaultQuestPopupOffsetY = 0f;
+
+    public const float MinQuestPopupOffsetY = -500f;
+
+    public const float MaxQuestPopupOffsetY = 500f;
+
 
     public static readonly Vector4 DefaultQuestTextColor = new Vector4(
         242f / 255f,
@@ -54,12 +74,65 @@ public class Configuration : IPluginConfiguration
         Plugin.PluginInterface.SavePluginConfig(this);
     }
 
+    public bool Validate()
+    {
+        var changed = false;
+
+        var fontSize = Math.Clamp(
+           QuestFontSize,
+           MinQuestFontSize,
+           MaxQuestFontSize
+        );
+
+        if (fontSize != QuestFontSize)
+        {
+            QuestFontSize = fontSize;
+            changed = true;
+        }
+
+        var popupScale = Math.Clamp(
+            QuestPopupScale,
+            MinQuestPopupScale,
+            MaxQuestPopupScale
+        );
+
+        if (popupScale != QuestPopupScale)
+        {
+            QuestPopupScale = popupScale;
+            changed = true;
+        }
+
+        var offsetX = Math.Clamp(
+            QuestPopupOffsetX,
+            MinQuestPopupOffsetX,
+            MaxQuestPopupOffsetX
+        );
+
+        if (offsetX != QuestPopupOffsetX)
+        {
+            QuestPopupOffsetX = offsetX;
+            changed = true;
+        }
+
+        var offsetY = Math.Clamp(
+            QuestPopupOffsetY,
+            MinQuestPopupOffsetY,
+            MaxQuestPopupOffsetY
+         );
+
+        if (offsetY != QuestPopupOffsetY)
+        {
+            QuestPopupOffsetY = offsetY;
+            changed = true;
+        }
+
+        return changed;
+    }
+
     public void ResetAppearance()
     {
         QuestTextColor = DefaultQuestTextColor;
-
         QuestEdgeColor = DefaultQuestEdgeColor;
-
         QuestFontSize = DefaultQuestFontSize;
 
         Save();
