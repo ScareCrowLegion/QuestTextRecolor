@@ -680,7 +680,7 @@ public class ConfigWindow : Window
         var version = typeof(Plugin).Assembly.GetName().Version;
 
         var versionText = version == null
-            ? "Unkown"
+            ? "Unknown"
             : $"{version.Major}.{version.Minor}.{version.Build}";
 
         ImGui.Text("Version");
