@@ -50,7 +50,10 @@ public sealed class Plugin : IDalamudPlugin
             PluginInterface.GetPluginConfig() as Configuration
             ?? new Configuration();
 
-        if (Configuration.Validate())
+        var configChanged = Configuration.Migrate();
+        var validationChanged = Configuration.Validate();
+
+        if (configChanged || validationChanged)
         {
             Configuration.Save();
         }

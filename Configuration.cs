@@ -34,6 +34,7 @@ public class Configuration : IPluginConfiguration
 
     public const float MaxQuestPopupOffsetY = 500f;
 
+    public const int CurrentConfigVersion = 1;
 
     public static readonly Vector4 DefaultQuestTextColor = new Vector4(
         242f / 255f,
@@ -49,7 +50,7 @@ public class Configuration : IPluginConfiguration
         1.0f
     );
 
-    public int Version { get; set; } = 0;
+    public int Version { get; set; } = CurrentConfigVersion;
 
     public bool EnableQuestTextRecolor { get; set; } = true;
 
@@ -72,6 +73,19 @@ public class Configuration : IPluginConfiguration
     public void Save()
     {
         Plugin.PluginInterface.SavePluginConfig(this);
+    }
+
+    public bool Migrate()
+    {
+        var changed = false;
+
+        if (Version == 0)
+        {
+            Version = 1;
+            changed = true;
+        }
+
+        return changed;
     }
 
     public bool Validate()
