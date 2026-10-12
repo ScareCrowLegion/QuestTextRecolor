@@ -7,11 +7,17 @@ using Penumbra.Api.IpcSubscribers;
 
 namespace QuestTextRecolor.Services;
 
-internal sealed class PenumbraService
+internal sealed class PenumbraService : IDisposable
 {
     private const string TemporaryModName = "QuestTextRecolor_PopupTexture";
 
+    private readonly Configuration configuration;
+
     private readonly IDalamudPluginInterface pluginInterface;
+
+    private readonly IDisposable penumbraInitializedSubscriber;
+
+    private readonly IDisposable penumbraDisposedSubscriber;
 
     private bool questPopupTexturesApplied;
 
@@ -20,14 +26,27 @@ internal sealed class PenumbraService
     private readonly AddTemporaryMod addTemporaryMod;
     private readonly RemoveTemporaryMod removeTemporaryMod;
 
-    public PenumbraService(IDalamudPluginInterface pluginInterface)
+    public PenumbraService(IDalamudPluginInterface pluginInterface, Configuration configuration)
     {
         this.pluginInterface = pluginInterface;
+        this.configuration = configuration;
 
         apiVersion = new ApiVersion(pluginInterface);
         getCollections = new GetCollections(pluginInterface);
         addTemporaryMod = new AddTemporaryMod(pluginInterface);
         removeTemporaryMod = new RemoveTemporaryMod(pluginInterface);
+
+        penumbraInitializedSubscriber =
+          Initialized.Subscriber(
+              pluginInterface,
+              OnPenumbraInitialized
+              );
+
+        penumbraDisposedSubscriber =
+            Disposed.Subscriber(
+                pluginInterface,
+                OnPenumbraDisposed
+                );
     }
 
     public bool IsAvailable()
@@ -161,5 +180,25 @@ internal sealed class PenumbraService
         {
             return false;
         }
+    }
+       public void Dispose()
+    {
+        penumbraInitializedSubscriber.Dispose();
+        penumbraDisposedSubscriber.Dispose();
+    }
+
+    private void OnPenumbraInitialized()
+    {
+     questPopupTexturesApplied = false;
+
+        if (configuration.EnableQuestPopupTextures)
+        {
+            ApplyQuestPopupTextures();
+        }
+    }
+
+    private void OnPenumbraDisposed()
+    {
+        questPopupTexturesApplied = false;
     }
 }

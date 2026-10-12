@@ -66,7 +66,7 @@ public sealed class Plugin : IDalamudPlugin
         TestPopupWindow = new TestPopupWindow(Configuration);
         WindowSystem.AddWindow(TestPopupWindow);
 
-        Penumbra = new PenumbraService(PluginInterface);
+        Penumbra = new PenumbraService(PluginInterface, Configuration);
 
         if (Configuration.EnableQuestPopupTextures &&
             Penumbra.IsAvailable())
@@ -120,6 +120,8 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.RemoveAllWindows();
 
         CommandManager.RemoveHandler(CommandName);
+
+        Penumbra.Dispose();
     }
 
     private void OnCommand(string command, string args)
