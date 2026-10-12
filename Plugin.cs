@@ -141,10 +141,6 @@ public sealed class Plugin : IDalamudPlugin
 
     private unsafe void OnScreenTextPostUpdate(AddonEvent type, AddonArgs args)
     {
-        if (!Configuration.EnableQuestTextRecolor)
-        {
-            return;
-        }
 
         var addon = (AtkUnitBase*)args.Addon.Address;
 
@@ -154,6 +150,22 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         var currentScreenTextAddress = (nint)addon;
+
+        if (!Configuration.EnableQuestTextRecolor)
+        {
+
+            if (currentScreenTextAddress == lastScreenTextAddress &&
+                (lastAppliedOffsetX != 0f || lastAppliedOffsetY != 0f))
+            {
+                var restoredX = (short)(addon->X - lastAppliedOffsetX);
+                var restoredY = (short)(addon->Y - lastAppliedOffsetY);
+
+                addon->SetPosition(restoredX, restoredY);
+            }
+
+            ResetScreenTextState();
+            return;
+        }
 
         if (currentScreenTextAddress != lastScreenTextAddress)
         {
