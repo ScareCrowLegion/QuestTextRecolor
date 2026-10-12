@@ -92,7 +92,13 @@ public sealed class Plugin : IDalamudPlugin
             AddonEvent.PostUpdate,
             "_ScreenText",
             OnScreenTextPostUpdate
-);
+            );
+
+        AddonLifecycle.RegisterListener(
+            AddonEvent.PreFinalize,
+            "_ScreenText",
+            OnScreenTextPreFinalize
+            );
     }
 
     public void Dispose()
@@ -104,6 +110,8 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         AddonLifecycle.UnregisterListener(OnScreenTextPostUpdate);
+
+        AddonLifecycle.UnregisterListener(OnScreenTextPreFinalize);
 
         PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
@@ -218,5 +226,11 @@ public sealed class Plugin : IDalamudPlugin
 
             ((AtkResNode*)textNode)->IsDirty = true;
         }
+    }
+     private void OnScreenTextPreFinalize(AddonEvent type, AddonArgs args)
+    {
+        lastScreenTextAddress = 0;
+        lastAppliedOffsetX = 0f;
+        lastAppliedOffsetY = 0f;
     }
 }
