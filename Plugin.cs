@@ -32,6 +32,8 @@ public sealed class Plugin : IDalamudPlugin
     private float lastAppliedOffsetX = 0f;
     private float lastAppliedOffsetY = 0f;
 
+    private nint lastScreenTextAddress = 0;
+
     public Configuration Configuration { get; init; }
 
     private TestPopupWindow TestPopupWindow { get; init; }
@@ -139,6 +141,15 @@ public sealed class Plugin : IDalamudPlugin
         if (addon == null)
         {
             return;
+        }
+
+        var currentScreenTextAddress = (nint)addon;
+
+        if (currentScreenTextAddress != lastScreenTextAddress)
+        {
+            lastAppliedOffsetX = 0f;
+            lastAppliedOffsetY = 0f;
+            lastScreenTextAddress = currentScreenTextAddress;
         }
 
         var offsetX = MathF.Round(Configuration.QuestPopupOffsetX);
