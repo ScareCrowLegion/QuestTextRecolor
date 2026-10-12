@@ -21,6 +21,8 @@ internal sealed class PenumbraService : IDisposable
 
     private bool questPopupTexturesApplied;
 
+    private Guid? questPopupTextureCollectionId;
+
     private readonly ApiVersion apiVersion;
     private readonly GetCollections getCollections;
     private readonly AddTemporaryMod addTemporaryMod;
@@ -142,6 +144,7 @@ internal sealed class PenumbraService : IDisposable
             if (result == PenumbraApiEc.Success)
             {
                 questPopupTexturesApplied = true;
+                questPopupTextureCollectionId = collectionId.Value;
                 return true;
             }
 
@@ -157,7 +160,8 @@ internal sealed class PenumbraService : IDisposable
     {
         try
         {
-            var collectionId = GetDefaultCollectionId();
+            var collectionId = questPopupTextureCollectionId
+                ?? GetDefaultCollectionId();
 
             if (!collectionId.HasValue)
                 return false;
@@ -168,9 +172,11 @@ internal sealed class PenumbraService : IDisposable
                 0
             );
 
-            if (result == PenumbraApiEc.Success)
+            if (result == PenumbraApiEc.Success ||
+                result == PenumbraApiEc.NothingChanged)
             {
                 questPopupTexturesApplied = false;
+                questPopupTextureCollectionId = null;
                 return true;
             }
 
@@ -200,5 +206,6 @@ internal sealed class PenumbraService : IDisposable
     private void OnPenumbraDisposed()
     {
         questPopupTexturesApplied = false;
+        questPopupTextureCollectionId = null;
     }
 }
