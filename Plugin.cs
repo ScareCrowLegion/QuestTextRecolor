@@ -155,8 +155,7 @@ public sealed class Plugin : IDalamudPlugin
 
         if (currentScreenTextAddress != lastScreenTextAddress)
         {
-            lastAppliedOffsetX = 0f;
-            lastAppliedOffsetY = 0f;
+            ResetScreenTextState();
             lastScreenTextAddress = currentScreenTextAddress;
         }
 
@@ -227,10 +226,17 @@ public sealed class Plugin : IDalamudPlugin
             ((AtkResNode*)textNode)->IsDirty = true;
         }
     }
+
      private void OnScreenTextPreFinalize(AddonEvent type, AddonArgs args)
+    {
+        ResetScreenTextState();
+    }
+
+    private void ResetScreenTextState()
     {
         lastScreenTextAddress = 0;
         lastAppliedOffsetX = 0f;
         lastAppliedOffsetY = 0f;
+
     }
 }
