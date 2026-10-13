@@ -108,8 +108,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         RestoreScreenTextPosition();
 
-        if (Configuration.EnableQuestPopupTextures &&
-            Penumbra.IsAvailable())
+        if (Penumbra.IsAvailable())
         {
             Penumbra.RemoveQuestPopupTextures();
         }
