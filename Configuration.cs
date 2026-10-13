@@ -104,11 +104,13 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
-        var popupScale = Math.Clamp(
+        var popupScale = ValidateFloat(
             QuestPopupScale,
+            DefaultQuestPopupScale,
             MinQuestPopupScale,
             MaxQuestPopupScale
         );
+
 
         if (popupScale != QuestPopupScale)
         {
@@ -116,8 +118,9 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
-        var offsetX = Math.Clamp(
+        var offsetX = ValidateFloat(
             QuestPopupOffsetX,
+            DefaultQuestPopupOffsetX,
             MinQuestPopupOffsetX,
             MaxQuestPopupOffsetX
         );
@@ -128,8 +131,9 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
-        var offsetY = Math.Clamp(
+        var offsetY = ValidateFloat(
             QuestPopupOffsetY,
+            DefaultQuestPopupOffsetY,
             MinQuestPopupOffsetY,
             MaxQuestPopupOffsetY
          );
@@ -141,6 +145,24 @@ public class Configuration : IPluginConfiguration
         }
 
         return changed;
+    }
+
+    private static float ValidateFloat(
+        float value,
+        float defaultValue,
+        float minValue,
+        float maxValue)
+    {
+        if (!float.IsFinite(value))
+        {
+            return defaultValue;
+        }
+
+        return Math.Clamp(
+            value,
+            minValue,
+            maxValue
+            );
     }
 
     public void ResetAppearance()
