@@ -529,14 +529,22 @@ public class ConfigWindow : Window
         if (ImGui.Checkbox(
             "Enable Custom Quest Popup Textures",
             ref enabled))
+
         {
-            configuration.EnableQuestPopupTextures =
-                enabled;
+         var previousEnabled =
+          configuration.EnableQuestPopupTextures;
 
+          configuration.EnableQuestPopupTextures = enabled;
+
+          if (plugin.Penumbra.RefreshQuestPopupTextures())
+        {
             configuration.Save();
-
-            plugin.Penumbra.RefreshQuestPopupTextures();
         }
+          else
+        {
+            configuration.EnableQuestPopupTextures = previousEnabled;
+        }
+    }
 
         ImGui.EndDisabled();
 
