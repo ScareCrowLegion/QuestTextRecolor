@@ -299,18 +299,6 @@ public sealed class Plugin : IDalamudPlugin
         ResetScreenTextState();
     }
 
-    private unsafe void RestoreScreenTextPosition()
-    {
-        if (lastScreenTextAddress == 0)
-        {
-            return;
-        }
-
-        var addon = GameGui.GetAddonByName<AtkUnitBase>("_ScreenText");
-
-        RestoreScreenTextPosition(addon);
-    }
-
     private unsafe void RestoreScreenTextPosition(AtkUnitBase* addon)
     {
         if (addon == null ||
