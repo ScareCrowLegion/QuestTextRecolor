@@ -144,6 +144,28 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
+        var textColor = ValidateColor(
+            QuestTextColor,
+            DefaultQuestTextColor
+        );
+
+        if (textColor != QuestTextColor)
+        {
+            QuestTextColor = textColor;
+            changed = true;
+        }
+
+        var edgeColor = ValidateColor(
+            QuestEdgeColor,
+            DefaultQuestEdgeColor
+        );
+
+        if (edgeColor != QuestEdgeColor)
+        {
+            QuestEdgeColor = edgeColor;
+            changed = true;
+        }
+
         return changed;
     }
 
@@ -163,6 +185,18 @@ public class Configuration : IPluginConfiguration
             minValue,
             maxValue
             );
+    }
+
+    private static Vector4 ValidateColor(
+        Vector4 value,
+        Vector4 defaultValue)
+    {
+        return new Vector4(
+            ValidateFloat(value.X, defaultValue.X, 0f, 1f),
+            ValidateFloat(value.Y, defaultValue.Y, 0f, 1f),
+            ValidateFloat(value.Z, defaultValue.Z, 0f, 1f),
+            ValidateFloat(value.W, defaultValue.W, 0f, 1f)
+        );
     }
 
     public void ResetAppearance()
