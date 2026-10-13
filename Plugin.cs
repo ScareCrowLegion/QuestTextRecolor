@@ -153,7 +153,7 @@ public sealed class Plugin : IDalamudPlugin
 
         if (!Configuration.EnableQuestTextRecolor)
         {
-            RestoreScreenTextPosition();
+            RestoreScreenTextPosition(addon);
             return;
         }
 
@@ -245,7 +245,13 @@ public sealed class Plugin : IDalamudPlugin
 
         var addon = GameGui.GetAddonByName<AtkUnitBase>("_ScreenText");
 
+        RestoreScreenTextPosition(addon);
+    }
+
+    private unsafe void RestoreScreenTextPosition(AtkUnitBase* addon)
+    {
         if (addon == null ||
+            lastScreenTextAddress == 0 ||
             (nint)addon != lastScreenTextAddress)
         {
             ResetScreenTextState();
@@ -259,11 +265,9 @@ public sealed class Plugin : IDalamudPlugin
             var restoredY = (short)(addon->Y - lastAppliedOffsetY);
 
             addon->SetPosition(restoredX, restoredY);
-
         }
 
         ResetScreenTextState();
-
     }
     private void ResetScreenTextState()
     {
