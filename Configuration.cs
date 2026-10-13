@@ -1,9 +1,6 @@
 using Dalamud.Configuration;
-using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
-using Penumbra.Api.IpcSubscribers;
 using System;
 using System.Numerics;
-using System.Threading.Channels;
 
 namespace QuestTextRecolor;
 
