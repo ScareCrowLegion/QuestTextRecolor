@@ -535,16 +535,7 @@ public class ConfigWindow : Window
 
             configuration.Save();
 
-            if (enabled)
-            {
-                plugin.Penumbra
-                    .ApplyQuestPopupTextures();
-            }
-            else
-            {
-                plugin.Penumbra
-                    .RemoveQuestPopupTextures();
-            }
+            plugin.Penumbra.RefreshQuestPopupTextures();
         }
 
         ImGui.EndDisabled();
