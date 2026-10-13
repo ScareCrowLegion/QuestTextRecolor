@@ -71,11 +71,7 @@ public sealed class Plugin : IDalamudPlugin
 
         Penumbra = new PenumbraService(PluginInterface, Configuration);
 
-        if (Configuration.EnableQuestPopupTextures &&
-            Penumbra.IsAvailable())
-        {
-            Penumbra.ApplyQuestPopupTextures();
-        }
+        Penumbra.RefreshQuestPopupTextures();
 
         CommandManager.AddHandler(
             CommandName,

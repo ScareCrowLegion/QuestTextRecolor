@@ -187,6 +187,29 @@ internal sealed class PenumbraService : IDisposable
             return false;
         }
     }
+
+    public bool RefreshQuestPopupTextures()
+    {
+        if (!IsAvailable())
+        {
+            questPopupTexturesApplied = false;
+            questPopupTextureCollectionId = null;
+            return false;
+        }
+
+        if (!RemoveQuestPopupTextures())
+        {
+            return false;
+        }
+
+        if (!configuration.EnableQuestPopupTextures)
+        {
+            return true;
+        }
+
+        return ApplyQuestPopupTextures();
+    }
+
        public void Dispose()
     {
         penumbraInitializedSubscriber.Dispose();
@@ -195,12 +218,10 @@ internal sealed class PenumbraService : IDisposable
 
     private void OnPenumbraInitialized()
     {
-     questPopupTexturesApplied = false;
+        questPopupTexturesApplied = false;
+        questPopupTextureCollectionId = null;
 
-        if (configuration.EnableQuestPopupTextures)
-        {
-            ApplyQuestPopupTextures();
-        }
+        RefreshQuestPopupTextures();
     }
 
     private void OnPenumbraDisposed()
