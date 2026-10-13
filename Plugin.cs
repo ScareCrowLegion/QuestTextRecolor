@@ -27,6 +27,9 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService]
     internal static ITextureProvider TextureProvider { get; private set; } = null!;
 
+    [PluginService]
+    internal static IGameGui GameGui { get; private set; } = null!;
+
     private const string CommandName = "/questtext";
 
     private float lastAppliedOffsetX = 0f;
@@ -103,6 +106,8 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
+        RestoreScreenTextPosition();
+
         if (Configuration.EnableQuestPopupTextures &&
             Penumbra.IsAvailable())
         {
@@ -153,17 +158,7 @@ public sealed class Plugin : IDalamudPlugin
 
         if (!Configuration.EnableQuestTextRecolor)
         {
-
-            if (currentScreenTextAddress == lastScreenTextAddress &&
-                (lastAppliedOffsetX != 0f || lastAppliedOffsetY != 0f))
-            {
-                var restoredX = (short)(addon->X - lastAppliedOffsetX);
-                var restoredY = (short)(addon->Y - lastAppliedOffsetY);
-
-                addon->SetPosition(restoredX, restoredY);
-            }
-
-            ResetScreenTextState();
+            RestoreScreenTextPosition();
             return;
         }
 
@@ -246,6 +241,35 @@ public sealed class Plugin : IDalamudPlugin
         ResetScreenTextState();
     }
 
+    private unsafe void RestoreScreenTextPosition()
+    {
+        if (lastScreenTextAddress == 0)
+        {
+            return;
+        }
+
+        var addon = GameGui.GetAddonByName<AtkUnitBase>("_ScreenText");
+
+        if (addon == null ||
+            (nint)addon != lastScreenTextAddress)
+        {
+            ResetScreenTextState();
+            return;
+        }
+
+        if (lastAppliedOffsetX != 0f ||
+            lastAppliedOffsetY != 0f)
+        {
+            var restoredX = (short)(addon->X - lastAppliedOffsetX);
+            var restoredY = (short)(addon->Y - lastAppliedOffsetY);
+
+            addon->SetPosition(restoredX, restoredY);
+
+        }
+
+        ResetScreenTextState();
+
+    }
     private void ResetScreenTextState()
     {
         lastScreenTextAddress = 0;
