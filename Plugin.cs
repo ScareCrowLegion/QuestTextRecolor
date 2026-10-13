@@ -213,6 +213,11 @@ public sealed class Plugin : IDalamudPlugin
         var textColor = Configuration.QuestTextColor;
         var edgeColor = Configuration.QuestEdgeColor;
 
+        if (addon->UldManager.NodeList == null)
+        {
+            return;
+        }
+
         for (int i = 0; i < addon->UldManager.NodeListCount; i++)
         {
             var topNode = addon->UldManager.NodeList[i];
@@ -226,6 +231,9 @@ public sealed class Plugin : IDalamudPlugin
             var componentNode = (AtkComponentNode*)topNode;
 
             if (componentNode->Component == null)
+                continue;
+
+            if (componentNode->Component->UldManager.NodeList == null)
                 continue;
 
             var node = componentNode->Component->UldManager.SearchNodeById(3);
@@ -330,6 +338,12 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
+        if (addon->UldManager.NodeList == null)
+        {
+            originalScreenTextAppearance.Clear();
+            return;
+        }
+
         for (int i = 0; i < addon->UldManager.NodeListCount; i++)
         {
             var topNode = addon->UldManager.NodeList[i];
@@ -343,6 +357,9 @@ public sealed class Plugin : IDalamudPlugin
             var componentNode = (AtkComponentNode*)topNode;
 
             if (componentNode->Component == null)
+                continue;
+
+            if (componentNode->Component->UldManager.NodeList == null)
                 continue;
 
             var node =
