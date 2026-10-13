@@ -76,6 +76,12 @@ public class Configuration : IPluginConfiguration
     {
         var changed = false;
 
+        if (Version < 0)
+        {
+            Version = 0;
+            changed = true;
+        }
+
         if (Version == 0)
         {
             Version = 1;
