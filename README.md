@@ -166,21 +166,11 @@ Opens the Quest Text Recolor configuration window.
 
 ## Installation
 
-Quest Text Recolor is currently available through a custom Dalamud plugin repository.
+Since being Approved by Dalamud Team. The Plugin can now be installed via Plugin Window inside Dalamud using the following command in game.
 
-Add the following URL to your Dalamud custom plugin repositories:
+`/xlplugins`
 
-`https://raw.githubusercontent.com/ScareCrowLegion/QuestTextRecolor/main/repo.json`
-
-Then search for:
-
-`Quest Text Recolor`
-
-in the Dalamud Plugin Installer.
-
-## Repository
-
-https://github.com/ScareCrowLegion/QuestTextRecolor
+Than search for Quest Text Recolor.
 
 ## Author
 
