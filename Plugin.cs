@@ -213,6 +213,24 @@ public sealed class Plugin : IDalamudPlugin
         var textColor = Configuration.QuestTextColor;
         var edgeColor = Configuration.QuestEdgeColor;
 
+        var popupScale = Configuration.QuestPopupScale;
+
+        var textColorR = (byte)(textColor.X * 255f);
+
+        var textColorG = (byte)(textColor.Y * 255f);
+
+        var textColorB = (byte)(textColor.Z * 255f);
+
+        var textColorA = (byte)(textColor.W * 255f);
+
+        var edgeColorR = (byte)(edgeColor.X * 255f);
+
+        var edgeColorG = (byte)(edgeColor.Y * 255f);
+
+        var edgeColorB = (byte)(edgeColor.Z * 255f);
+
+        var edgeColorA = (byte)(edgeColor.W * 255f);
+
         if (addon->UldManager.NodeList == null)
         {
             return;
@@ -281,24 +299,45 @@ public sealed class Plugin : IDalamudPlugin
             {
                 originalAppearance.ScaleModified = true;
 
-                var popupScale = Configuration.QuestPopupScale;
-
-                topNode->SetScale(popupScale, popupScale);
+                if (topNode->ScaleX != popupScale ||
+                    topNode->ScaleY != popupScale)
+                {
+                    topNode->SetScale(
+                        popupScale,
+                        popupScale
+                   );
+                }
             }
 
-            textNode->FontSize = (byte)Configuration.QuestFontSize;
+            var fontSize = (byte)Configuration.QuestFontSize;
 
-            textNode->TextColor.R = (byte)(textColor.X * 255f);
-            textNode->TextColor.G = (byte)(textColor.Y * 255f);
-            textNode->TextColor.B = (byte)(textColor.Z * 255f);
-            textNode->TextColor.A = (byte)(textColor.W * 255f);
+            var appearanceChanged =
+                textNode->FontSize != fontSize ||
+                textNode->TextColor.R != textColorR ||
+                textNode->TextColor.G != textColorG ||
+                textNode->TextColor.B != textColorB ||
+                textNode->TextColor.A != textColorA ||
+                textNode->EdgeColor.R != edgeColorR ||
+                textNode->EdgeColor.G != edgeColorG ||
+                textNode->EdgeColor.B != edgeColorB ||
+                textNode->EdgeColor.A != edgeColorA;
 
-            textNode->EdgeColor.R = (byte)(edgeColor.X * 255f);
-            textNode->EdgeColor.G = (byte)(edgeColor.Y * 255f);
-            textNode->EdgeColor.B = (byte)(edgeColor.Z * 255f);
-            textNode->EdgeColor.A = (byte)(edgeColor.W * 255f);
+            if (appearanceChanged)
+            {
+                textNode->FontSize = fontSize;
 
-            ((AtkResNode*)textNode)->IsDirty = true;
+                textNode->TextColor.R = textColorR;
+                textNode->TextColor.G = textColorG;
+                textNode->TextColor.B = textColorB;
+                textNode->TextColor.A = textColorA;
+
+                textNode->EdgeColor.R = edgeColorR;
+                textNode->EdgeColor.G = edgeColorG;
+                textNode->EdgeColor.B = edgeColorB;
+                textNode->EdgeColor.A = edgeColorA;
+
+                ((AtkResNode*)textNode)->IsDirty = true;
+            }
         }
     }
 
