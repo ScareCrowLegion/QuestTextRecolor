@@ -47,7 +47,14 @@ class TestPopupWindow : Window
         const string testText = "Wait at the designated location.";
 
         var font = ImGui.GetFont();
-        var fontSize = (float)configuration.QuestFontSize;
+
+        var popupScale = configuration.QuestPopupScale;
+
+        var fontSize = configuration.QuestFontSize * popupScale;
+
+        var offsetX = configuration.QuestPopupOffsetX;
+
+        var offsetY = configuration.QuestPopupOffsetY;
 
         // Give the transparent popup plenty of drawing room.
         var popupWidth = 800f;
@@ -63,8 +70,14 @@ class TestPopupWindow : Window
         ImGui.SetWindowPos(
             "Quest Text Recolor Test Popup###QuestTextRecolorTestPopup",
             new Vector2(
-                viewport.Pos.X + (viewport.Size.X / 2f) - (popupWidth / 2f),
-                viewport.Pos.Y + (viewport.Size.Y * 0.35f)
+                viewport.Pos.X +
+                (viewport.Size.X / 2f) -
+                (popupWidth / 2f) +
+                offsetX,
+
+                viewport.Pos.Y +
+                (viewport.Size.Y * 0.35f) +
+                offsetY
             ),
             ImGuiCond.Always
         );
@@ -78,8 +91,15 @@ class TestPopupWindow : Window
         var textWidth = baseTextSize.X * scale;
 
         var position = new Vector2(
-           viewport.Pos.X + (viewport.Size.X / 2f) - (textWidth / 2f),
-           viewport.Pos.Y + (viewport.Size.Y * 0.35f) + 20f
+           viewport.Pos.X +
+           (viewport.Size.X / 2f) -
+           (textWidth / 2f) +
+           offsetX,
+
+           viewport.Pos.Y +
+           (viewport.Size.Y * 0.35f) +
+           20f +
+           offsetY
 );
 
 

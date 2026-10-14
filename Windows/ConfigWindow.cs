@@ -564,7 +564,7 @@ public class ConfigWindow : Window
         ImGui.Text("In-Game Preview");
 
         ImGui.TextDisabled(
-            "Preview your current text colors and font size in game."
+            "Preview your current colors, font size, scale, and position."
         );
 
         ImGui.Spacing();
