@@ -163,9 +163,9 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Toggle();
     }
 
-    public void ShowTestPopup()
+    public void ShowTestPopup(string text)
     {
-        TestPopupWindow.Show();
+        TestPopupWindow.Show(text);
     }
 
     private unsafe void OnScreenTextPostUpdate(AddonEvent type, AddonArgs args)

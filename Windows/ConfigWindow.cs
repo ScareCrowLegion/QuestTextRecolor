@@ -569,16 +569,37 @@ public class ConfigWindow : Window
 
         ImGui.Spacing();
 
-        if (ImGui.Button("Show Test Popup"))
+        if (ImGui.Button("Short"))
         {
-            plugin.ShowTestPopup();
+            plugin.ShowTestPopup(
+                "Objective complete."
+                );
         }
 
         ImGui.SameLine();
 
+        if (ImGui.Button("Standard"))
+        {
+            plugin.ShowTestPopup(
+                "Wait at the designated location."
+                );
+        }
+
+        ImGui.SameLine();
+
+        if (ImGui.Button("Long"))
+        {
+            plugin.ShowTestPopup(
+                "Investigate the disturbance and report your findings."
+                );
+        }
+
+        ImGui.Spacing();
+
         ImGui.TextDisabled(
-            "Displays for 4 seconds."
-        );
+            "Choose a sample length. Preview displays for 4 seconds."
+            );
+
     }
 
     private void DrawResetSection()

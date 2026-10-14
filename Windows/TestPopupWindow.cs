@@ -11,6 +11,9 @@ class TestPopupWindow : Window
 
     private DateTime hideAt;
 
+    private string previewText =
+        "Wait at the designated location.";
+
     public TestPopupWindow(Configuration configuration)
         : base("Quest Text Recolor Test Popup###QuestTextRecolorTestPopup")
     {
@@ -28,8 +31,9 @@ class TestPopupWindow : Window
         IsOpen = false;
     }
 
-    public void Show()
+    public void Show(string text)
     {
+        previewText = text;
         hideAt = DateTime.UtcNow.AddSeconds(4);
         IsOpen = true;
     }
@@ -44,7 +48,7 @@ class TestPopupWindow : Window
 
         var viewport = ImGui.GetMainViewport();
 
-        const string testText = "Wait at the designated location.";
+        var testText = previewText;
 
         var font = ImGui.GetFont();
 
