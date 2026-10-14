@@ -1,9 +1,6 @@
 using Dalamud.Configuration;
-using FFXIVClientStructs.FFXIV.Client.Game.InstanceContent;
-using Penumbra.Api.IpcSubscribers;
 using System;
 using System.Numerics;
-using System.Threading.Channels;
 
 namespace QuestTextRecolor;
 
@@ -34,6 +31,7 @@ public class Configuration : IPluginConfiguration
 
     public const float MaxQuestPopupOffsetY = 500f;
 
+    public const int CurrentConfigVersion = 1;
 
     public static readonly Vector4 DefaultQuestTextColor = new Vector4(
         242f / 255f,
@@ -49,7 +47,7 @@ public class Configuration : IPluginConfiguration
         1.0f
     );
 
-    public int Version { get; set; } = 0;
+    public int Version { get; set; } = CurrentConfigVersion;
 
     public bool EnableQuestTextRecolor { get; set; } = true;
 
@@ -74,6 +72,25 @@ public class Configuration : IPluginConfiguration
         Plugin.PluginInterface.SavePluginConfig(this);
     }
 
+    public bool Migrate()
+    {
+        var changed = false;
+
+        if (Version < 0)
+        {
+            Version = 0;
+            changed = true;
+        }
+
+        if (Version == 0)
+        {
+            Version = 1;
+            changed = true;
+        }
+
+        return changed;
+    }
+
     public bool Validate()
     {
         var changed = false;
@@ -90,11 +107,13 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
-        var popupScale = Math.Clamp(
+        var popupScale = ValidateFloat(
             QuestPopupScale,
+            DefaultQuestPopupScale,
             MinQuestPopupScale,
             MaxQuestPopupScale
         );
+
 
         if (popupScale != QuestPopupScale)
         {
@@ -102,8 +121,9 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
-        var offsetX = Math.Clamp(
+        var offsetX = ValidateFloat(
             QuestPopupOffsetX,
+            DefaultQuestPopupOffsetX,
             MinQuestPopupOffsetX,
             MaxQuestPopupOffsetX
         );
@@ -114,8 +134,9 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
-        var offsetY = Math.Clamp(
+        var offsetY = ValidateFloat(
             QuestPopupOffsetY,
+            DefaultQuestPopupOffsetY,
             MinQuestPopupOffsetY,
             MaxQuestPopupOffsetY
          );
@@ -126,7 +147,59 @@ public class Configuration : IPluginConfiguration
             changed = true;
         }
 
+        var textColor = ValidateColor(
+            QuestTextColor,
+            DefaultQuestTextColor
+        );
+
+        if (textColor != QuestTextColor)
+        {
+            QuestTextColor = textColor;
+            changed = true;
+        }
+
+        var edgeColor = ValidateColor(
+            QuestEdgeColor,
+            DefaultQuestEdgeColor
+        );
+
+        if (edgeColor != QuestEdgeColor)
+        {
+            QuestEdgeColor = edgeColor;
+            changed = true;
+        }
+
         return changed;
+    }
+
+    private static float ValidateFloat(
+        float value,
+        float defaultValue,
+        float minValue,
+        float maxValue)
+    {
+        if (!float.IsFinite(value))
+        {
+            return defaultValue;
+        }
+
+        return Math.Clamp(
+            value,
+            minValue,
+            maxValue
+            );
+    }
+
+    private static Vector4 ValidateColor(
+        Vector4 value,
+        Vector4 defaultValue)
+    {
+        return new Vector4(
+            ValidateFloat(value.X, defaultValue.X, 0f, 1f),
+            ValidateFloat(value.Y, defaultValue.Y, 0f, 1f),
+            ValidateFloat(value.Z, defaultValue.Z, 0f, 1f),
+            ValidateFloat(value.W, defaultValue.W, 0f, 1f)
+        );
     }
 
     public void ResetAppearance()

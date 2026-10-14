@@ -9,6 +9,7 @@ using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using QuestTextRecolor.Services;
 using System;
+using System.Collections.Generic;
 
 
 namespace QuestTextRecolor;
@@ -27,10 +28,39 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService]
     internal static ITextureProvider TextureProvider { get; private set; } = null!;
 
+    [PluginService]
+    internal static IGameGui GameGui { get; private set; } = null!;
+
     private const string CommandName = "/questtext";
 
     private float lastAppliedOffsetX = 0f;
     private float lastAppliedOffsetY = 0f;
+
+    private nint lastScreenTextAddress = 0;
+
+    private readonly Dictionary<nint, ScreenTextAppearanceState>
+        originalScreenTextAppearance = new();
+
+    private sealed class ScreenTextAppearanceState
+    {
+        public float ScaleX;
+        public float ScaleY;
+
+        public bool ScaleModified;
+
+        public byte FontSize;
+
+        public byte TextColorR;
+        public byte TextColorG;
+        public byte TextColorB;
+        public byte TextColorA;
+
+        public byte EdgeColorR;
+        public byte EdgeColorG;
+        public byte EdgeColorB;
+        public byte EdgeColorA;
+
+    }
 
     public Configuration Configuration { get; init; }
 
@@ -50,7 +80,10 @@ public sealed class Plugin : IDalamudPlugin
             PluginInterface.GetPluginConfig() as Configuration
             ?? new Configuration();
 
-        if (Configuration.Validate())
+        var configChanged = Configuration.Migrate();
+        var validationChanged = Configuration.Validate();
+
+        if (configChanged || validationChanged)
         {
             Configuration.Save();
         }
@@ -61,13 +94,9 @@ public sealed class Plugin : IDalamudPlugin
         TestPopupWindow = new TestPopupWindow(Configuration);
         WindowSystem.AddWindow(TestPopupWindow);
 
-        Penumbra = new PenumbraService(PluginInterface);
+        Penumbra = new PenumbraService(PluginInterface, Configuration);
 
-        if (Configuration.EnableQuestPopupTextures &&
-            Penumbra.IsAvailable())
-        {
-            Penumbra.ApplyQuestPopupTextures();
-        }
+        Penumbra.RefreshQuestPopupTextures();
 
         CommandManager.AddHandler(
             CommandName,
@@ -87,18 +116,31 @@ public sealed class Plugin : IDalamudPlugin
             AddonEvent.PostUpdate,
             "_ScreenText",
             OnScreenTextPostUpdate
-);
+            );
+
+        AddonLifecycle.RegisterListener(
+            AddonEvent.PreFinalize,
+            "_ScreenText",
+            OnScreenTextPreFinalize
+            );
     }
 
-    public void Dispose()
+    public unsafe void Dispose()
     {
-        if (Configuration.EnableQuestPopupTextures &&
-            Penumbra.IsAvailable())
+        var screenTextAddon =
+            GameGui.GetAddonByName<AtkUnitBase>("_ScreenText");
+
+        RestoreScreenTextAppearance(screenTextAddon);
+        RestoreScreenTextPosition(screenTextAddon);
+
+        if (Penumbra.IsAvailable())
         {
             Penumbra.RemoveQuestPopupTextures();
         }
 
         AddonLifecycle.UnregisterListener(OnScreenTextPostUpdate);
+
+        AddonLifecycle.UnregisterListener(OnScreenTextPreFinalize);
 
         PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
@@ -107,6 +149,8 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.RemoveAllWindows();
 
         CommandManager.RemoveHandler(CommandName);
+
+        Penumbra.Dispose();
     }
 
     private void OnCommand(string command, string args)
@@ -119,23 +163,34 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Toggle();
     }
 
-    public void ShowTestPopup()
+    public void ShowTestPopup(string text)
     {
-        TestPopupWindow.Show();
+        TestPopupWindow.Show(text);
     }
 
     private unsafe void OnScreenTextPostUpdate(AddonEvent type, AddonArgs args)
     {
-        if (!Configuration.EnableQuestTextRecolor)
-        {
-            return;
-        }
 
         var addon = (AtkUnitBase*)args.Addon.Address;
 
         if (addon == null)
         {
             return;
+        }
+
+        var currentScreenTextAddress = (nint)addon;
+
+        if (!Configuration.EnableQuestTextRecolor)
+        {
+            RestoreScreenTextAppearance(addon);
+            RestoreScreenTextPosition(addon);
+            return;
+        }
+
+        if (currentScreenTextAddress != lastScreenTextAddress)
+        {
+            ResetScreenTextState();
+            lastScreenTextAddress = currentScreenTextAddress;
         }
 
         var offsetX = MathF.Round(Configuration.QuestPopupOffsetX);
@@ -158,6 +213,29 @@ public sealed class Plugin : IDalamudPlugin
         var textColor = Configuration.QuestTextColor;
         var edgeColor = Configuration.QuestEdgeColor;
 
+        var popupScale = Configuration.QuestPopupScale;
+
+        var textColorR = (byte)(textColor.X * 255f);
+
+        var textColorG = (byte)(textColor.Y * 255f);
+
+        var textColorB = (byte)(textColor.Z * 255f);
+
+        var textColorA = (byte)(textColor.W * 255f);
+
+        var edgeColorR = (byte)(edgeColor.X * 255f);
+
+        var edgeColorG = (byte)(edgeColor.Y * 255f);
+
+        var edgeColorB = (byte)(edgeColor.Z * 255f);
+
+        var edgeColorA = (byte)(edgeColor.W * 255f);
+
+        if (addon->UldManager.NodeList == null)
+        {
+            return;
+        }
+
         for (int i = 0; i < addon->UldManager.NodeListCount; i++)
         {
             var topNode = addon->UldManager.NodeList[i];
@@ -173,6 +251,9 @@ public sealed class Plugin : IDalamudPlugin
             if (componentNode->Component == null)
                 continue;
 
+            if (componentNode->Component->UldManager.NodeList == null)
+                continue;
+
             var node = componentNode->Component->UldManager.SearchNodeById(3);
 
             if (node == null)
@@ -183,26 +264,208 @@ public sealed class Plugin : IDalamudPlugin
 
             var textNode = (AtkTextNode*)node;
 
-            if (topNode->X != 0f || topNode->Y != 0f)
-            {
-                var popupScale = Configuration.QuestPopupScale;
+            var textNodeAddress = (nint)textNode;
 
-                topNode->SetScale(popupScale, popupScale);
+            if (!originalScreenTextAppearance.TryGetValue(
+                textNodeAddress,
+                out var originalAppearance))
+            {
+                originalAppearance = new ScreenTextAppearanceState
+                {
+                    ScaleX = topNode->ScaleX,
+                    ScaleY = topNode->ScaleY,
+
+                    ScaleModified = false,
+
+                    FontSize = textNode->FontSize,
+
+                    TextColorR = textNode->TextColor.R,
+                    TextColorG = textNode->TextColor.G,
+                    TextColorB = textNode->TextColor.B,
+                    TextColorA = textNode->TextColor.A,
+
+                    EdgeColorR = textNode->EdgeColor.R,
+                    EdgeColorG = textNode->EdgeColor.G,
+                    EdgeColorB = textNode->EdgeColor.B,
+                    EdgeColorA = textNode->EdgeColor.A
+                };
+
+                originalScreenTextAppearance[
+                    textNodeAddress
+                ] = originalAppearance;
             }
 
-            textNode->FontSize = (byte)Configuration.QuestFontSize;
+            if (topNode->X != 0f || topNode->Y != 0f)
+            {
+                originalAppearance.ScaleModified = true;
 
-            textNode->TextColor.R = (byte)(textColor.X * 255f);
-            textNode->TextColor.G = (byte)(textColor.Y * 255f);
-            textNode->TextColor.B = (byte)(textColor.Z * 255f);
-            textNode->TextColor.A = (byte)(textColor.W * 255f);
+                if (topNode->ScaleX != popupScale ||
+                    topNode->ScaleY != popupScale)
+                {
+                    topNode->SetScale(
+                        popupScale,
+                        popupScale
+                   );
+                }
+            }
 
-            textNode->EdgeColor.R = (byte)(edgeColor.X * 255f);
-            textNode->EdgeColor.G = (byte)(edgeColor.Y * 255f);
-            textNode->EdgeColor.B = (byte)(edgeColor.Z * 255f);
-            textNode->EdgeColor.A = (byte)(edgeColor.W * 255f);
+            var fontSize = (byte)Configuration.QuestFontSize;
+
+            var appearanceChanged =
+                textNode->FontSize != fontSize ||
+                textNode->TextColor.R != textColorR ||
+                textNode->TextColor.G != textColorG ||
+                textNode->TextColor.B != textColorB ||
+                textNode->TextColor.A != textColorA ||
+                textNode->EdgeColor.R != edgeColorR ||
+                textNode->EdgeColor.G != edgeColorG ||
+                textNode->EdgeColor.B != edgeColorB ||
+                textNode->EdgeColor.A != edgeColorA;
+
+            if (appearanceChanged)
+            {
+                textNode->FontSize = fontSize;
+
+                textNode->TextColor.R = textColorR;
+                textNode->TextColor.G = textColorG;
+                textNode->TextColor.B = textColorB;
+                textNode->TextColor.A = textColorA;
+
+                textNode->EdgeColor.R = edgeColorR;
+                textNode->EdgeColor.G = edgeColorG;
+                textNode->EdgeColor.B = edgeColorB;
+                textNode->EdgeColor.A = edgeColorA;
+
+                ((AtkResNode*)textNode)->IsDirty = true;
+            }
+        }
+    }
+
+     private void OnScreenTextPreFinalize(AddonEvent type, AddonArgs args)
+    {
+        ResetScreenTextState();
+    }
+
+    private unsafe void RestoreScreenTextPosition(AtkUnitBase* addon)
+    {
+        if (addon == null ||
+            lastScreenTextAddress == 0 ||
+            (nint)addon != lastScreenTextAddress)
+        {
+            ResetScreenTextState();
+            return;
+        }
+
+        if (lastAppliedOffsetX != 0f ||
+            lastAppliedOffsetY != 0f)
+        {
+            var restoredX = (short)(addon->X - lastAppliedOffsetX);
+            var restoredY = (short)(addon->Y - lastAppliedOffsetY);
+
+            addon->SetPosition(restoredX, restoredY);
+        }
+
+        ResetScreenTextState();
+    }
+
+    private unsafe void RestoreScreenTextAppearance(AtkUnitBase* addon)
+    {
+        if (addon == null || lastScreenTextAddress == 0 ||
+                (nint)addon != lastScreenTextAddress)
+        {
+            ResetScreenTextState();
+            return;
+        }
+
+        if (addon->UldManager.NodeList == null)
+        {
+            originalScreenTextAppearance.Clear();
+            return;
+        }
+
+        for (int i = 0; i < addon->UldManager.NodeListCount; i++)
+        {
+            var topNode = addon->UldManager.NodeList[i];
+
+            if (topNode == null)
+                continue;
+
+            if ((ushort)topNode->Type < 1000)
+                continue;
+
+            var componentNode = (AtkComponentNode*)topNode;
+
+            if (componentNode->Component == null)
+                continue;
+
+            if (componentNode->Component->UldManager.NodeList == null)
+                continue;
+
+            var node =
+                componentNode->Component->UldManager.SearchNodeById(3);
+
+            if (node == null)
+                continue;
+
+            if (node->Type != NodeType.Text)
+                continue;
+
+            var textNode = (AtkTextNode*)node;
+
+            if (!originalScreenTextAppearance.TryGetValue(
+                (nint)textNode,
+                out var originalAppearance))
+            {
+                continue;
+            }
+
+            if (originalAppearance.ScaleModified)
+            {
+                topNode->SetScale(
+                    originalAppearance.ScaleX,
+                    originalAppearance.ScaleY
+                );
+            }
+
+            textNode->FontSize =
+                originalAppearance.FontSize;
+
+            textNode->TextColor.R =
+                originalAppearance.TextColorR;
+
+            textNode->TextColor.G =
+                originalAppearance.TextColorG;
+
+            textNode->TextColor.B =
+                originalAppearance.TextColorB;
+
+            textNode->TextColor.A =
+                originalAppearance.TextColorA;
+
+            textNode->EdgeColor.R =
+                originalAppearance.EdgeColorR;
+
+            textNode->EdgeColor.G =
+                originalAppearance.EdgeColorG;
+
+            textNode->EdgeColor.B =
+                originalAppearance.EdgeColorB;
+
+            textNode->EdgeColor.A =
+                originalAppearance.EdgeColorA;
 
             ((AtkResNode*)textNode)->IsDirty = true;
         }
+
+        originalScreenTextAppearance.Clear();
+    }
+    private void ResetScreenTextState()
+    {
+        lastScreenTextAddress = 0;
+        lastAppliedOffsetX = 0f;
+        lastAppliedOffsetY = 0f;
+
+        originalScreenTextAppearance.Clear();
+
     }
 }

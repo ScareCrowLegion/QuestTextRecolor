@@ -7,27 +7,48 @@ using Penumbra.Api.IpcSubscribers;
 
 namespace QuestTextRecolor.Services;
 
-internal sealed class PenumbraService
+internal sealed class PenumbraService : IDisposable
 {
     private const string TemporaryModName = "QuestTextRecolor_PopupTexture";
 
+    private readonly Configuration configuration;
+
     private readonly IDalamudPluginInterface pluginInterface;
 
+    private readonly IDisposable penumbraInitializedSubscriber;
+
+    private readonly IDisposable penumbraDisposedSubscriber;
+
     private bool questPopupTexturesApplied;
+
+    private Guid? questPopupTextureCollectionId;
 
     private readonly ApiVersion apiVersion;
     private readonly GetCollections getCollections;
     private readonly AddTemporaryMod addTemporaryMod;
     private readonly RemoveTemporaryMod removeTemporaryMod;
 
-    public PenumbraService(IDalamudPluginInterface pluginInterface)
+    public PenumbraService(IDalamudPluginInterface pluginInterface, Configuration configuration)
     {
         this.pluginInterface = pluginInterface;
+        this.configuration = configuration;
 
         apiVersion = new ApiVersion(pluginInterface);
         getCollections = new GetCollections(pluginInterface);
         addTemporaryMod = new AddTemporaryMod(pluginInterface);
         removeTemporaryMod = new RemoveTemporaryMod(pluginInterface);
+
+        penumbraInitializedSubscriber =
+          Initialized.Subscriber(
+              pluginInterface,
+              OnPenumbraInitialized
+              );
+
+        penumbraDisposedSubscriber =
+            Disposed.Subscriber(
+                pluginInterface,
+                OnPenumbraDisposed
+                );
     }
 
     public bool IsAvailable()
@@ -123,6 +144,7 @@ internal sealed class PenumbraService
             if (result == PenumbraApiEc.Success)
             {
                 questPopupTexturesApplied = true;
+                questPopupTextureCollectionId = collectionId.Value;
                 return true;
             }
 
@@ -138,7 +160,8 @@ internal sealed class PenumbraService
     {
         try
         {
-            var collectionId = GetDefaultCollectionId();
+            var collectionId = questPopupTextureCollectionId
+                ?? GetDefaultCollectionId();
 
             if (!collectionId.HasValue)
                 return false;
@@ -149,9 +172,11 @@ internal sealed class PenumbraService
                 0
             );
 
-            if (result == PenumbraApiEc.Success)
+            if (result == PenumbraApiEc.Success ||
+                result == PenumbraApiEc.NothingChanged)
             {
                 questPopupTexturesApplied = false;
+                questPopupTextureCollectionId = null;
                 return true;
             }
 
@@ -161,5 +186,47 @@ internal sealed class PenumbraService
         {
             return false;
         }
+    }
+
+    public bool RefreshQuestPopupTextures()
+    {
+        if (!IsAvailable())
+        {
+            questPopupTexturesApplied = false;
+            questPopupTextureCollectionId = null;
+            return false;
+        }
+
+        if (!RemoveQuestPopupTextures())
+        {
+            return false;
+        }
+
+        if (!configuration.EnableQuestPopupTextures)
+        {
+            return true;
+        }
+
+        return ApplyQuestPopupTextures();
+    }
+
+       public void Dispose()
+    {
+        penumbraInitializedSubscriber.Dispose();
+        penumbraDisposedSubscriber.Dispose();
+    }
+
+    private void OnPenumbraInitialized()
+    {
+        questPopupTexturesApplied = false;
+        questPopupTextureCollectionId = null;
+
+        RefreshQuestPopupTextures();
+    }
+
+    private void OnPenumbraDisposed()
+    {
+        questPopupTexturesApplied = false;
+        questPopupTextureCollectionId = null;
     }
 }
