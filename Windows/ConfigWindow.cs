@@ -33,17 +33,38 @@ public class ConfigWindow : Window
         Flags = ImGuiWindowFlags.NoResize |
                 ImGuiWindowFlags.NoCollapse;
 
-        Size = new Vector2(680, 520);
+        Size = new Vector2(820, 580);
         SizeCondition = ImGuiCond.Always;
     }
 
     public override void Draw()
     {
+        DrawHeader();
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
+
+        ImGui.PushStyleVar(
+            ImGuiStyleVar.ChildRounding,
+            8f
+            );
+
+        ImGui.PushStyleColor(
+            ImGuiCol.ChildBg,
+            new Vector4(
+                0.08f,
+                0.08f,
+                0.10f,
+                0.72f
+                )
+            );
+
         ImGui.BeginChild(
             "Navigation",
-            new Vector2(150f, 0f),
+            new Vector2(180f, 0f),
             true
-        );
+           );
 
         DrawNavigation();
 
@@ -54,80 +75,168 @@ public class ConfigWindow : Window
         ImGui.BeginChild(
             "Content",
             new Vector2(0f, 0f),
-            false
-        );
+            true
+            );
 
         DrawCurrentPage();
 
         ImGui.EndChild();
+
+        ImGui.PopStyleColor();
+        ImGui.PopStyleVar();
+
+    }
+
+    private void DrawHeader()
+    {
+        ImGui.TextColored(
+            new Vector4(
+                0.95f,
+                0.89f,
+                0.72f,
+                1.0f
+                ),
+            "QUEST TEXT RECOLOR"
+            );
+
+        ImGui.TextDisabled(
+            "Customize your quest objective popup."
+            );
+
+        ImGui.SameLine();
+
+        var availableWidth =
+            ImGui.GetContentRegionAvail().X;
+
+        if (availableWidth > 190f)
+        {
+            ImGui.SetCursorPosX(
+                ImGui.GetCursorPosX() +
+                availableWidth -
+                185f
+                );
+
+            if (configuration.EnableQuestTextRecolor)
+            {
+                ImGui.TextColored(
+                    new Vector4(
+                        0.40f,
+                        0.85f,
+                        0.55f,
+                        1.0f
+                        ),
+                    "● ACTIVE"
+                    );
+            }
+            else
+            {
+                ImGui.TextDisabled(
+                    "● DISABLED"
+                    );
+            }
+        }
     }
 
     private void DrawNavigation()
     {
-        ImGui.Text("Settings");
+        ImGui.TextDisabled("CUSTOMIZATION");
+
+        ImGui.Spacing();
+
+        DrawNavigationItem(
+            "General",
+            ConfigPage.General
+        );
+
+        DrawNavigationItem(
+            "Colors",
+            ConfigPage.Colors
+        );
+
+        DrawNavigationItem(
+            "Text Style",
+            ConfigPage.TextStyle
+        );
+
+        DrawNavigationItem(
+            "Popup Layout",
+            ConfigPage.PopupLayout
+        );
+
+        DrawNavigationItem(
+            "Presets",
+            ConfigPage.Presets
+        );
+
+        ImGui.Spacing();
         ImGui.Separator();
         ImGui.Spacing();
 
-        if (ImGui.Selectable(
-            "General",
-            currentPage == ConfigPage.General))
-        {
-            currentPage = ConfigPage.General;
-        }
+        ImGui.TextDisabled("INTEGRATION");
 
         ImGui.Spacing();
 
-        if (ImGui.Selectable(
-            "Colors",
-            currentPage == ConfigPage.Colors))
-        {
-            currentPage = ConfigPage.Colors;
-        }
-
-        ImGui.Spacing();
-
-        if (ImGui.Selectable(
-            "Text Style",
-            currentPage == ConfigPage.TextStyle))
-        {
-            currentPage = ConfigPage.TextStyle;
-        }
-
-        ImGui.Spacing();
-
-        if (ImGui.Selectable(
-            "Popup Layout",
-            currentPage == ConfigPage.PopupLayout))
-        {
-            currentPage = ConfigPage.PopupLayout;
-        }
-
-        ImGui.Spacing();
-
-        if (ImGui.Selectable(
-            "Presets",
-            currentPage == ConfigPage.Presets))
-        {
-            currentPage = ConfigPage.Presets;
-        }
-
-        ImGui.Spacing();
-
-        if (ImGui.Selectable(
+        DrawNavigationItem(
             "Textures",
-            currentPage == ConfigPage.Textures))
-        {
-            currentPage = ConfigPage.Textures;
-        }
+            ConfigPage.Textures
+        );
+
+        ImGui.Spacing();
+        ImGui.Separator();
+        ImGui.Spacing();
+
+        ImGui.TextDisabled("PLUGIN");
 
         ImGui.Spacing();
 
-        if (ImGui.Selectable(
+        DrawNavigationItem(
             "About",
-            currentPage == ConfigPage.About))
+            ConfigPage.About
+        );
+    }
+
+    private void DrawNavigationItem(string label, ConfigPage page)
+    {
+        var selected =
+            currentPage == page;
+
+        if (selected)
         {
-            currentPage = ConfigPage.About;
+            ImGui.PushStyleColor(
+                ImGuiCol.Header,
+                new Vector4(
+                    0.26f,
+                    0.35f,
+                    0.48f,
+                    0.90f
+                )
+            );
+
+            ImGui.PushStyleColor(
+                ImGuiCol.HeaderHovered,
+                new Vector4(
+                    0.30f,
+                    0.40f,
+                    0.55f,
+                    1.0f
+                )
+            );
         }
+
+        if (ImGui.Selectable(
+            label,
+            selected,
+            ImGuiSelectableFlags.None,
+            new Vector2(0f, 32f)))
+        {
+            currentPage = page;
+        }
+
+        if (selected)
+        {
+            ImGui.PopStyleColor(2);
+        }
+
     }
 
     private void DrawCurrentPage()
