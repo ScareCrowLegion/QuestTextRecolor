@@ -54,4 +54,12 @@
 		</Content>
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Remove="QuestTextRecolor.Tests\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="CONFIG_TEST_CHECKLIST.md" />
+	</ItemGroup>
+
 </Project>

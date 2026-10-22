@@ -5,4 +5,5 @@
   <Project Path="Quest Text Recolor.csproj">
     <Platform Project="x64" />
   </Project>
+  <Project Path="QuestTextRecolor.Tests/QuestTextRecolor.Tests.csproj" />
 </Solution>
